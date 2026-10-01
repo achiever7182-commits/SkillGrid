@@ -44,9 +44,11 @@ function taskAppliesOn(t: Task, date: string) {
   return t.days_of_week.includes(parse(date).getDay());
 }
 
-/** Generate missing task instances for [from, min(to, today)]. Idempotent. */
-export async function ensureInstances(userId: string, from: string, to = todayStr()) {
-  const end = to > todayStr() ? todayStr() : to;
+/** Generate missing task instances for [from, min(to, today+60d)]. Idempotent. */
+export async function ensureInstances(userId: string, from: string, to?: string) {
+  const maxHorizon = toStr(addDays(new Date(), 60));
+  const end = to ? (to > maxHorizon ? maxHorizon : to) : maxHorizon;
+  if (from > end) return;
   const { data: tasks, error } = await supabase
     .from("tasks")
     .select("id,title,subject_id,planned_minutes,days_of_week,recurring,start_date,end_date")
@@ -54,15 +56,29 @@ export async function ensureInstances(userId: string, from: string, to = todaySt
     .eq("archived", false);
   if (error) throw error;
   const rows: {
-    task_id: string; user_id: string; subject_id: string | null; title: string; date: string; planned_minutes: number;
+    task_id: string;
+    user_id: string;
+    subject_id: string | null;
+    title: string;
+    date: string;
+    planned_minutes: number;
   }[] = [];
   for (const t of tasks ?? []) {
     const start = t.start_date > from ? t.start_date : from;
-    const n = differenceInCalendarDays(parse(end), parse(start));
+    const taskEnd = t.end_date && t.end_date < end ? t.end_date : end;
+    if (start > taskEnd) continue;
+    const n = differenceInCalendarDays(parse(taskEnd), parse(start));
     for (let i = 0; i <= n; i++) {
       const d = toStr(addDays(parse(start), i));
       if (taskAppliesOn(t, d))
-        rows.push({ task_id: t.id, user_id: userId, subject_id: t.subject_id, title: t.title, date: d, planned_minutes: t.planned_minutes });
+        rows.push({
+          task_id: t.id,
+          user_id: userId,
+          subject_id: t.subject_id,
+          title: t.title,
+          date: d,
+          planned_minutes: t.planned_minutes,
+        });
     }
   }
   for (let i = 0; i < rows.length; i += 500) {
@@ -73,26 +89,44 @@ export async function ensureInstances(userId: string, from: string, to = todaySt
   }
 }
 
-export type DayStat = { day: string; planned: number; completed: number; total_tasks: number; done_tasks: number };
+export type DayStat = {
+  day: string;
+  planned: number;
+  completed: number;
+  total_tasks: number;
+  done_tasks: number;
+};
 
-export const pctOf = (done: number, total: number) => (total > 0 ? Math.round((done / total) * 1000) / 10 : 0);
+export const pctOf = (done: number, total: number) =>
+  total > 0 ? Math.round((done / total) * 1000) / 10 : 0;
 export const dayPct = (d: Pick<DayStat, "planned" | "completed">) => pctOf(d.completed, d.planned);
 
 export function computeStreaks(stats: DayStat[], threshold: number) {
   const today = todayStr();
+  const pastAndToday = stats.filter((d) => d.day <= today);
   const qualifies = (d: DayStat) => d.planned > 0 && dayPct(d) >= threshold;
-  let longest = 0, run = 0;
-  for (const d of stats) {
+  let longest = 0,
+    run = 0;
+  for (const d of pastAndToday) {
     if (d.planned === 0) continue; // rest day: neither counts nor breaks
-    if (qualifies(d)) { run++; longest = Math.max(longest, run); } else if (d.day !== today) run = 0;
+    if (qualifies(d)) {
+      run++;
+      longest = Math.max(longest, run);
+    } else if (d.day !== today) {
+      run = 0;
+    }
   }
   let current = 0;
-  for (let i = stats.length - 1; i >= 0; i--) {
-    const d = stats[i];
-    if (d.planned === 0) continue;
-    if (qualifies(d)) current++;
-    else if (d.day === today) continue; // today still in progress
-    else break;
+  for (let i = pastAndToday.length - 1; i >= 0; i--) {
+    const d = pastAndToday[i];
+    if (!d || d.planned === 0) continue;
+    if (qualifies(d)) {
+      current++;
+    } else if (d.day === today) {
+      continue; // today still in progress
+    } else {
+      break;
+    }
   }
   return { current, longest };
 }
@@ -105,8 +139,16 @@ export function heatLevel(pct: number, planned: number) {
   return 4;
 }
 
-export async function fetchDailyStats(userId: string, from: string, to: string): Promise<DayStat[]> {
-  const { data, error } = await supabase.rpc("get_daily_stats", { _user: userId, _from: from, _to: to });
+export async function fetchDailyStats(
+  userId: string,
+  from: string,
+  to: string,
+): Promise<DayStat[]> {
+  const { data, error } = await supabase.rpc("get_daily_stats", {
+    _user: userId,
+    _from: from,
+    _to: to,
+  });
   if (error) throw error;
   return (data ?? []).map((r) => ({ ...r, day: String(r.day) }));
 }

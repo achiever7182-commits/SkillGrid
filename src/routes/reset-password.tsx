@@ -25,23 +25,46 @@ function Reset() {
   const [loading, setLoading] = useState(false);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (pw.length < 8) return toast.error("Password must be at least 8 characters");
-    if (pw !== confirm) return toast.error("Passwords don't match");
+    if (pw.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+    if (pw !== confirm) {
+      toast.error("Passwords don't match");
+      return;
+    }
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password: pw });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Password updated");
     navigate({ to: "/dashboard" });
   }
   return (
     <div className="grid min-h-screen place-items-center px-4">
       <div className="w-full max-w-sm">
-        <div className="mb-8 flex justify-center"><Logo /></div>
+        <div className="mb-8 flex justify-center">
+          <Logo />
+        </div>
         <form onSubmit={submit} className="glass grid gap-3 rounded-2xl p-6">
           <h1 className="text-xl font-semibold">Choose a new password</h1>
-          <Input type="password" placeholder="New password" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="new-password" />
-          <Input type="password" placeholder="Confirm password" value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="new-password" />
+          <Input
+            type="password"
+            placeholder="New password"
+            value={pw}
+            onChange={(e) => setPw(e.target.value)}
+            autoComplete="new-password"
+          />
+          <Input
+            type="password"
+            placeholder="Confirm password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            autoComplete="new-password"
+          />
           <Button disabled={loading}>{loading ? "Saving…" : "Update password"}</Button>
         </form>
       </div>

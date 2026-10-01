@@ -7,7 +7,9 @@ export function getTheme(): ThemeMode {
 
 export function applyTheme(mode: ThemeMode) {
   localStorage.setItem("ss-theme", mode);
-  const dark = mode === "dark" || (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const dark =
+    mode === "dark" ||
+    (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   document.documentElement.classList.toggle("dark", dark);
 }
 

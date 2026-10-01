@@ -15,7 +15,11 @@ export function useProfile() {
     queryKey: ["profile", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("*").eq("id", user!.id).single();
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user!.id)
+        .single();
       if (error) throw error;
       return data;
     },
@@ -28,7 +32,11 @@ export function useSettings() {
     queryKey: ["settings", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase.from("user_settings").select("*").eq("user_id", user!.id).single();
+      const { data, error } = await supabase
+        .from("user_settings")
+        .select("*")
+        .eq("user_id", user!.id)
+        .single();
       if (error) throw error;
       return data;
     },
@@ -41,7 +49,11 @@ export function useSubjects() {
     queryKey: ["subjects", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase.from("subjects").select("*").eq("user_id", user!.id).order("created_at");
+      const { data, error } = await supabase
+        .from("subjects")
+        .select("*")
+        .eq("user_id", user!.id)
+        .order("created_at");
       if (error) throw error;
       return data;
     },

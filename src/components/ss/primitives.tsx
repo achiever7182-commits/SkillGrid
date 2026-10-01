@@ -1,14 +1,12 @@
 import type { ReactNode } from "react";
+import { BookOpenCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      <div className="grid size-8 grid-cols-2 gap-0.5 rounded-lg bg-primary/10 p-1.5">
-        <span className="rounded-[2px] bg-primary" />
-        <span className="rounded-[2px] bg-primary/40" />
-        <span className="rounded-[2px] bg-primary/70" />
-        <span className="rounded-[2px] bg-primary" />
+    <div className={cn("flex items-center gap-2.5", className)}>
+      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-primary/30 bg-primary/15 text-primary shadow-[0_0_12px_rgba(132,204,22,0.2)]">
+        <BookOpenCheck className="size-4.5" />
       </div>
       <span className="font-display text-lg font-semibold tracking-tight">StudySync</span>
     </div>
@@ -28,17 +26,41 @@ export function SectionTitle({ children, action }: { children: ReactNode; action
   );
 }
 
-export function ProgressRing({ value, size = 140, stroke = 12, children }: { value: number; size?: number; stroke?: number; children?: ReactNode }) {
+export function ProgressRing({
+  value,
+  size = 140,
+  stroke = 12,
+  children,
+}: {
+  value: number;
+  size?: number;
+  stroke?: number;
+  children?: ReactNode;
+}) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const v = Math.max(0, Math.min(100, value));
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--color-muted)" strokeWidth={stroke} />
         <circle
-          cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--color-primary)" strokeWidth={stroke}
-          strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c - (v / 100) * c}
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="var(--color-muted)"
+          strokeWidth={stroke}
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="var(--color-primary)"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={c - (v / 100) * c}
           style={{ transition: "stroke-dashoffset 700ms cubic-bezier(.2,.8,.2,1)" }}
         />
       </svg>
@@ -47,7 +69,17 @@ export function ProgressRing({ value, size = 140, stroke = 12, children }: { val
   );
 }
 
-export function StatCard({ label, value, sub, icon }: { label: string; value: ReactNode; sub?: ReactNode; icon?: ReactNode }) {
+export function StatCard({
+  label,
+  value,
+  sub,
+  icon,
+}: {
+  label: string;
+  value: ReactNode;
+  sub?: ReactNode;
+  icon?: ReactNode;
+}) {
   return (
     <Panel className="flex flex-col gap-2">
       <div className="flex items-center justify-between text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -60,18 +92,51 @@ export function StatCard({ label, value, sub, icon }: { label: string; value: Re
   );
 }
 
-export function UserAvatar({ url, name, size = 36 }: { url?: string | null; name?: string | null; size?: number }) {
-  const initials = (name || "?").split(/\s+/).map((s) => s[0]).join("").slice(0, 2).toUpperCase();
+export function UserAvatar({
+  url,
+  name,
+  size = 36,
+}: {
+  url?: string | null | undefined;
+  name?: string | null | undefined;
+  size?: number;
+}) {
+  const initials = (name || "?")
+    .split(/\s+/)
+    .map((s) => s[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
   return url ? (
-    <img src={url} alt={name ?? "avatar"} width={size} height={size} className="shrink-0 rounded-full bg-muted object-cover" style={{ width: size, height: size }} />
+    <img
+      src={url}
+      alt={name ?? "avatar"}
+      width={size}
+      height={size}
+      className="shrink-0 rounded-full bg-muted object-cover"
+      style={{ width: size, height: size }}
+    />
   ) : (
-    <div className="grid shrink-0 place-items-center rounded-full bg-accent font-display text-xs font-semibold text-accent-foreground" style={{ width: size, height: size }}>
+    <div
+      className="grid shrink-0 place-items-center rounded-full bg-accent font-display text-xs font-semibold text-accent-foreground"
+      style={{ width: size, height: size }}
+    >
       {initials}
     </div>
   );
 }
 
-export function EmptyState({ icon, title, body, action }: { icon?: ReactNode; title: string; body?: string; action?: ReactNode }) {
+export function EmptyState({
+  icon,
+  title,
+  body,
+  action,
+}: {
+  icon?: ReactNode;
+  title: string;
+  body?: string;
+  action?: ReactNode;
+}) {
   return (
     <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-6 py-10 text-center">
       {icon && <div className="text-muted-foreground">{icon}</div>}

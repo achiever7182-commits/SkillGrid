@@ -25,8 +25,16 @@ export function Heatmap({ daily }: { daily: DayStat[] }) {
         <h2 className="text-base font-semibold">Activity</h2>
         <div className="flex rounded-lg bg-muted p-0.5 text-xs">
           {(Object.keys(RANGES) as (keyof typeof RANGES)[]).map((r) => (
-            <button key={r} onClick={() => setRange(r)}
-              className={cn("rounded-md px-2.5 py-1 font-medium transition", range === r ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground")}>
+            <button
+              key={r}
+              onClick={() => setRange(r)}
+              className={cn(
+                "rounded-md px-2.5 py-1 font-medium transition",
+                range === r
+                  ? "bg-background shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
               {r}
             </button>
           ))}
@@ -42,17 +50,28 @@ export function Heatmap({ daily }: { daily: DayStat[] }) {
                 return (
                   <Tooltip key={day}>
                     <TooltipTrigger asChild>
-                      <div className={cn("size-3 rounded-[3px] transition hover:ring-1 hover:ring-foreground/40", LEVEL[heatLevel(pct, s?.planned ?? 0)])} />
+                      <div
+                        className={cn(
+                          "size-3 rounded-[3px] transition hover:ring-1 hover:ring-foreground/40",
+                          LEVEL[heatLevel(pct, s?.planned ?? 0)],
+                        )}
+                      />
                     </TooltipTrigger>
                     <TooltipContent className="text-xs">
                       <div className="font-semibold">{format(parse(day), "MMMM d, yyyy")}</div>
                       {s && s.planned > 0 ? (
                         <>
                           <div>Completion: {Math.round(pct)}%</div>
-                          <div>Completed: {hours(s.completed)} / {hours(s.planned)} hours</div>
-                          <div>Tasks: {s.done_tasks} / {s.total_tasks}</div>
+                          <div>
+                            Completed: {hours(s.completed)} / {hours(s.planned)} hours
+                          </div>
+                          <div>
+                            Tasks: {s.done_tasks} / {s.total_tasks}
+                          </div>
                         </>
-                      ) : <div>No planned tasks</div>}
+                      ) : (
+                        <div>No planned tasks</div>
+                      )}
                     </TooltipContent>
                   </Tooltip>
                 );
@@ -62,7 +81,11 @@ export function Heatmap({ daily }: { daily: DayStat[] }) {
         </div>
       </div>
       <div className="mt-2 flex items-center justify-end gap-1 text-[10px] text-muted-foreground">
-        Less {LEVEL.map((l) => <span key={l} className={cn("size-2.5 rounded-[2px]", l)} />)} More
+        Less{" "}
+        {LEVEL.map((l) => (
+          <span key={l} className={cn("size-2.5 rounded-[2px]", l)} />
+        ))}{" "}
+        More
       </div>
     </div>
   );

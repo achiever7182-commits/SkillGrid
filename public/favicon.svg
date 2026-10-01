@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141c18" />
+      <stop offset="100%" stop-color="#080c0a" />
+    </linearGradient>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a3e635" />
+      <stop offset="100%" stop-color="#22c55e" />
+    </linearGradient>
+  </defs>
+  <!-- Background Container -->
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="url(#bgGrad)" stroke="#a3e635" stroke-opacity="0.3" stroke-width="8" />
+  
+  <!-- Book Open Check Icon -->
+  <g stroke="url(#primaryGrad)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Left page -->
+    <path d="M120 160c40-20 80-20 120 0v200c-40-20-80-20-120 0z" fill="#a3e635" fill-opacity="0.12"/>
+    <!-- Right page -->
+    <path d="M272 160c40-20 80-20 120 0v200c-40-20-80-20-120 0z" fill="#a3e635" fill-opacity="0.12"/>
+    <!-- Center spine -->
+    <path d="M256 160v200" />
+    <!-- Checkmark on right page -->
+    <path d="M304 250l24 24 48-48" stroke="#a3e635" stroke-width="28" />
+  </g>
+</svg>

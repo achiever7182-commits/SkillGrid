@@ -25,26 +25,46 @@ function Forgot() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: `${window.location.origin}/reset-password` });
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setSent(true);
   }
   return (
     <div className="grid min-h-screen place-items-center px-4">
       <div className="w-full max-w-sm">
-        <Link to="/" className="mb-8 flex justify-center"><Logo /></Link>
+        <Link to="/" className="mb-8 flex justify-center">
+          <Logo />
+        </Link>
         <div className="glass rounded-2xl p-6">
           <h1 className="text-xl font-semibold">Forgot your password?</h1>
           {sent ? (
-            <p className="mt-2 text-sm text-muted-foreground">If an account exists for {email}, a reset link is on its way.</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              If an account exists for {email}, a reset link is on its way.
+            </p>
           ) : (
             <form onSubmit={submit} className="mt-4 grid gap-3">
-              <Input type="email" placeholder="you@college.edu" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <Input
+                type="email"
+                placeholder="you@college.edu"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
               <Button disabled={loading}>{loading ? "Sending…" : "Send reset link"}</Button>
             </form>
           )}
-          <Link to="/auth" className="mt-4 block text-center text-sm text-muted-foreground hover:text-foreground">Back to log in</Link>
+          <Link
+            to="/auth"
+            className="mt-4 block text-center text-sm text-muted-foreground hover:text-foreground"
+          >
+            Back to log in
+          </Link>
         </div>
       </div>
     </div>

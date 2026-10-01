@@ -1,11 +1,25 @@
 import { format } from "date-fns";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { dayPct, pctOf, type DayStat } from "@/lib/data";
 import { hours, parse } from "@/lib/dates";
 
 const axis = { fontSize: 11, fill: "var(--color-muted-foreground)" };
 const tipStyle = {
-  background: "var(--color-popover)", border: "1px solid var(--color-border)", borderRadius: 10, fontSize: 12, color: "var(--color-foreground)",
+  background: "var(--color-popover)",
+  border: "1px solid var(--color-border)",
+  borderRadius: 10,
+  fontSize: 12,
+  color: "var(--color-foreground)",
 };
 
 export function WeeklyBarChart({ days }: { days: DayStat[] }) {
@@ -16,7 +30,11 @@ export function WeeklyBarChart({ days }: { days: DayStat[] }) {
         <CartesianGrid vertical={false} stroke="var(--color-border)" />
         <XAxis dataKey="name" tick={axis} axisLine={false} tickLine={false} />
         <YAxis domain={[0, 100]} tick={axis} axisLine={false} tickLine={false} unit="%" />
-        <Tooltip cursor={{ fill: "var(--color-muted)", opacity: 0.4 }} contentStyle={tipStyle} formatter={(v) => [`${v}%`, "Completion"]} />
+        <Tooltip
+          cursor={{ fill: "var(--color-muted)", opacity: 0.4 }}
+          contentStyle={tipStyle}
+          formatter={(v) => [`${v}%`, "Completion"]}
+        />
         <Bar dataKey="pct" fill="var(--color-primary)" radius={[6, 6, 2, 2]} maxBarSize={36} />
       </BarChart>
     </ResponsiveContainer>
@@ -24,10 +42,17 @@ export function WeeklyBarChart({ days }: { days: DayStat[] }) {
 }
 
 export function WeeklyLineChart({ days }: { days: DayStat[] }) {
-  let p = 0, c = 0;
+  let p = 0,
+    c = 0;
   const data = days.map((d) => {
-    p += d.planned; c += d.completed;
-    return { name: format(parse(d.day), "EEE"), planned: hours(p), completed: hours(c), pct: pctOf(c, p) };
+    p += d.planned;
+    c += d.completed;
+    return {
+      name: format(parse(d.day), "EEE"),
+      planned: hours(p),
+      completed: hours(c),
+      pct: pctOf(c, p),
+    };
   });
   return (
     <ResponsiveContainer width="100%" height={220}>
@@ -42,8 +67,22 @@ export function WeeklyLineChart({ days }: { days: DayStat[] }) {
         <XAxis dataKey="name" tick={axis} axisLine={false} tickLine={false} />
         <YAxis tick={axis} axisLine={false} tickLine={false} unit="h" />
         <Tooltip contentStyle={tipStyle} />
-        <Area type="monotone" dataKey="planned" name="Planned (h)" stroke="var(--color-muted-foreground)" strokeDasharray="4 4" fill="transparent" />
-        <Area type="monotone" dataKey="completed" name="Completed (h)" stroke="var(--color-primary)" strokeWidth={2} fill="url(#fillC)" />
+        <Area
+          type="monotone"
+          dataKey="planned"
+          name="Planned (h)"
+          stroke="var(--color-muted-foreground)"
+          strokeDasharray="4 4"
+          fill="transparent"
+        />
+        <Area
+          type="monotone"
+          dataKey="completed"
+          name="Completed (h)"
+          stroke="var(--color-primary)"
+          strokeWidth={2}
+          fill="url(#fillC)"
+        />
       </AreaChart>
     </ResponsiveContainer>
   );
