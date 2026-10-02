@@ -1,10 +1,11 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Lock } from "lucide-react";
 import { AppShell } from "@/components/ss/app-shell";
 import { Heatmap } from "@/components/ss/heatmap";
 import { EmptyState, Panel, SectionTitle, StatCard, UserAvatar } from "@/components/ss/primitives";
 import { SubjectCards } from "@/components/ss/subject-cards";
+import { ChatButton } from "@/components/ss/chat-button";
 import { supabase } from "@/integrations/supabase/client";
 import { useProgress } from "@/hooks/use-progress";
 import { hours } from "@/lib/dates";
@@ -62,6 +63,7 @@ function ProfilePage() {
               </p>
               {profile?.bio && <p className="mt-1 max-w-xl text-sm">{profile.bio}</p>}
             </div>
+            {id && <div className="ml-auto"><ChatButton friendId={id} /></div>}
           </div>
           {p?.visible ? (
             <>

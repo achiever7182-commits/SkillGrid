@@ -8,6 +8,150 @@ export type Database = {
   };
   public: {
     Tables: {
+      chat_requests: {
+        Row: {
+          id: string;
+          sender_id: string;
+          receiver_id: string;
+          status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          sender_id: string;
+          receiver_id: string;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          sender_id?: string;
+          receiver_id?: string;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "chat_requests_sender_id_fkey";
+            columns: ["sender_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "chat_requests_receiver_id_fkey";
+            columns: ["receiver_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      chat_rooms: {
+        Row: {
+          id: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      chat_room_members: {
+        Row: {
+          id: string;
+          room_id: string;
+          user_id: string;
+          last_read_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          room_id: string;
+          user_id: string;
+          last_read_at?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          room_id?: string;
+          user_id?: string;
+          last_read_at?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "chat_room_members_room_id_fkey";
+            columns: ["room_id"];
+            isOneToOne: false;
+            referencedRelation: "chat_rooms";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "chat_room_members_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      messages: {
+        Row: {
+          id: string;
+          room_id: string;
+          sender_id: string;
+          content: string;
+          created_at: string;
+          edited_at: string | null;
+          deleted_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          room_id: string;
+          sender_id: string;
+          content: string;
+          created_at?: string;
+          edited_at?: string | null;
+          deleted_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          room_id?: string;
+          sender_id?: string;
+          content?: string;
+          created_at?: string;
+          edited_at?: string | null;
+          deleted_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "messages_room_id_fkey";
+            columns: ["room_id"];
+            isOneToOne: false;
+            referencedRelation: "chat_rooms";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey";
+            columns: ["sender_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       activities: {
         Row: {
           created_at: string;
@@ -621,6 +765,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      accept_chat_request: { Args: { _request_id: string }; Returns: string };
       are_friends: { Args: { _a: string; _b: string }; Returns: boolean };
       basic_profiles: {
         Args: { _ids: string[] };

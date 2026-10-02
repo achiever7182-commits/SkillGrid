@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Flame, Search } from "lucide-react";
@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppShell, PageHeader } from "@/components/ss/app-shell";
 import { ActivityFeed } from "@/components/ss/activity-feed";
 import { EmptyState, Panel, SectionTitle, UserAvatar } from "@/components/ss/primitives";
+import { ChatButton } from "@/components/ss/chat-button";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/hooks/use-session";
 import { useProgress } from "@/hooks/use-progress";
@@ -51,6 +52,9 @@ function FriendCard({ f }: { f: Basic }) {
         ) : (
           <div className="text-xs text-muted-foreground">Progress is private</div>
         )}
+      </div>
+      <div className="ml-auto" onClick={(e) => e.preventDefault()}>
+        <ChatButton friendId={f.id} />
       </div>
     </Link>
   );

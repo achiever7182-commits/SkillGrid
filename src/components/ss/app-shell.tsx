@@ -14,6 +14,7 @@ import {
   User,
   UserPlus,
   Users,
+  MessageSquare,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -37,12 +38,13 @@ const NAV = [
   { to: "/tasks", label: "Tasks", icon: ListChecks },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/friends", label: "Friends", icon: Users },
+  { to: "/messages", label: "Messages", icon: MessageSquare },
   { to: "/rewards", label: "Rewards", icon: Trophy },
   { to: "/history", label: "History", icon: History },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
 const MOBILE_NAV = NAV.filter((n) =>
-  ["/dashboard", "/planner", "/tasks", "/rewards", "/friends"].includes(n.to),
+  ["/dashboard", "/planner", "/tasks", "/messages", "/friends"].includes(n.to),
 );
 
 export function AppShell({ children }: { children: ReactNode }) {
