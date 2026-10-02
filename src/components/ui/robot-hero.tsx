@@ -487,35 +487,40 @@ export function RobotPrototype({
       tx = -1.0;
       ty = 0.5;
     } else if (lookState === "email") {
-      tx = 0.5;
+      tx = 0.6;
       ty = -0.1;
     }
 
     const vw = state.viewport.width;
     const vh = state.viewport.height;
-    const isNarrow = vw < 3.4;
+    const isNarrow = vw < 4.5;
 
     let targetPosX: number;
     let targetPosY: number;
 
     if (isNarrow) {
-      // On narrow/mobile screens, keep it above the login block so it never overlaps or goes behind
+      // On narrow/mobile screens, keep it centered above the login block
       targetPosX = THREE.MathUtils.clamp(tx * 0.8, -0.6, 0.6);
       targetPosY = 1.5;
     } else {
-      // Desktop / wide screen:
-      // Position robot on the OPPOSITE (left) side of the login block:
-      // Card occupies the center (x ∈ [-1.25, 1.25]).
-      // maxX keeps it safely to the left of the card without touching or going behind:
-      const maxX = -Math.max(1.7, vw * 0.28);
-      const minX = -Math.max(2.1, vw * 0.44);
+      // Full-screen desktop view:
+      // The login card is centered in the right column at x = +vw * 0.25.
+      // Left edge of the login card with safety buffer:
+      const screenW = typeof window !== "undefined" ? window.innerWidth : 1440;
+      const cardHalfWidthIn3D = (208 / screenW) * vw;
+      const cardLeftEdge = (vw * 0.25) - cardHalfWidthIn3D;
 
-      // When cursor moves, robot walks flexibly within [minX, maxX] on the left of the card
-      const normalizedMouseX = Math.max(0, Math.min(1, (tx + 1.0) / 1.5));
+      // The robot can walk "more far" across the entire left and center of the website,
+      // but strictly stops before the login block (maxX) so it never touches or goes behind it.
+      const maxX = cardLeftEdge - 0.6;
+      const minX = -vw * 0.40;
+
+      // Map cursor movement across the screen to [minX, maxX]
+      const normalizedMouseX = Math.max(0, Math.min(1, (tx + 0.85) / 1.5));
       targetPosX = THREE.MathUtils.lerp(minX, maxX, normalizedMouseX);
 
       // Flexible vertical movement following cursor
-      targetPosY = THREE.MathUtils.clamp(ty * (vh * 0.28) - 0.25, -1.0, 1.0);
+      targetPosY = THREE.MathUtils.clamp(ty * (vh * 0.32) - 0.2, -1.2, 1.2);
     }
 
     // Dynamic walking / hover physics
@@ -647,7 +652,7 @@ export function RobotPrototype({
   return (
     <group
       ref={bodyRef}
-      position={[-1.8, -0.2, 0]}
+      position={[-0.8, -0.2, 0]}
       onPointerDown={handlePointerDown}
       onPointerOver={() => (document.body.style.cursor = "pointer")}
       onPointerOut={() => (document.body.style.cursor = "auto")}

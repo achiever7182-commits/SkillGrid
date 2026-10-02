@@ -114,32 +114,34 @@ function AuthPage() {
   }
 
   return (
-    <div className="relative min-h-screen grid lg:grid-cols-2 grid-cols-1 overflow-hidden bg-background">
-      {/* Left Editorial Side */}
-      <div className="hidden lg:flex flex-col justify-center px-12 lg:px-24 bg-transparent z-10 relative">
-        <div className="absolute top-12 left-12 lg:top-24 lg:left-24">
-          <Logo />
-        </div>
-        <div className="max-w-md mt-16">
-          <p className="text-xs font-bold tracking-[0.15em] text-primary/80 uppercase mb-6">01 — Welcome</p>
-          <h1 className="font-display text-5xl lg:text-7xl font-bold leading-[1.05] tracking-tight text-foreground">
-            Discipline <br />
-            <span className="text-primary">becomes</span> <br />
-            momentum.
-          </h1>
-          <p className="mt-8 text-muted-foreground text-lg leading-relaxed max-w-sm font-sans">
-            Turn your daily effort into measurable progress. A private space designed for your continuous growth.
-          </p>
-        </div>
+    <div className="relative min-h-screen overflow-hidden bg-background">
+      {/* Full-screen 3D Mascot: walks freely across the whole screen without clipping under columns */}
+      <div className="absolute inset-0 z-10 pointer-events-none">
+        <RobotMascot lookState={lookState} success={loginSuccess} />
       </div>
 
-      {/* Right Form Side */}
-      <div className="flex items-center justify-center relative bg-secondary/30">
-        <div className="absolute inset-0 z-20 pointer-events-none">
-          <RobotMascot lookState={lookState} success={loginSuccess} />
+      <div className="relative z-20 min-h-screen grid lg:grid-cols-2 grid-cols-1 pointer-events-none">
+        {/* Left Editorial Side */}
+        <div className="hidden lg:flex flex-col justify-center px-12 lg:px-24 bg-transparent relative">
+          <div className="absolute top-12 left-12 lg:top-24 lg:left-24 pointer-events-auto">
+            <Logo />
+          </div>
+          <div className="max-w-md mt-16 pointer-events-auto">
+            <p className="text-xs font-bold tracking-[0.15em] text-primary/80 uppercase mb-6">01 — Welcome</p>
+            <h1 className="font-display text-5xl lg:text-7xl font-bold leading-[1.05] tracking-tight text-foreground">
+              Discipline <br />
+              <span className="text-primary">becomes</span> <br />
+              momentum.
+            </h1>
+            <p className="mt-8 text-muted-foreground text-lg leading-relaxed max-w-sm font-sans">
+              Turn your daily effort into measurable progress. A private space designed for your continuous growth.
+            </p>
+          </div>
         </div>
 
-        <div className="w-full max-w-[26rem] z-10 relative px-6 py-12 lg:p-0">
+        {/* Right Form Side */}
+        <div className="flex items-center justify-center relative">
+          <div className="w-full max-w-[26rem] relative px-6 py-12 lg:p-0 pointer-events-auto">
           <div className="lg:hidden mb-12 flex justify-center">
             <Logo />
           </div>
@@ -268,5 +270,6 @@ function AuthPage() {
         </div>
       </div>
     </div>
+  </div>
   );
 }
