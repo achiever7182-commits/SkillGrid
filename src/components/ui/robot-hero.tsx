@@ -34,7 +34,8 @@ export function ResponsiveGroup({
   scale?: number;
 }) {
   const { viewport } = useThree();
-  const s = Math.min(1.1, viewport.width / 3.5) * scale;
+  // Mobile responsive scaling
+  const s = Math.min(1.5, viewport.width / 3.5) * scale;
   return <group scale={s}>{children}</group>;
 }
 
@@ -708,17 +709,17 @@ export function RobotMascot({ lookState, success }: { lookState: 'idle' | 'email
     <div className="w-full h-full relative pointer-events-none">
       <Canvas 
         shadows 
-        camera={{ position: [0, 0.5, 5], fov: 40 }}
+        camera={{ position: [0, 0.5, 6], fov: 40 }}
         eventSource={typeof window !== "undefined" ? document.body : undefined}
         eventPrefix="client"
       >
         <ambientLight intensity={1.5} color="#ffffff" />
         <directionalLight position={[0, 6, 3]} intensity={1.2} castShadow />
         <Environment preset="studio" blur={0.5} />
-        <group scale={6}>
+        <ResponsiveGroup scale={2.2}>
           <ContactShadows position={[0, -0.7, 0]} opacity={0.6} scale={20} blur={1.5} />
           <RobotPrototype lookState={lookState} success={success} color="#e0e0e0" pantallaColor="#ff3366" />
-        </group>
+        </ResponsiveGroup>
       </Canvas>
     </div>
   );
