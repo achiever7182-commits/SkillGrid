@@ -78,29 +78,29 @@ export function ActivityFeed({ limit = 20 }: { limit?: number }) {
     );
 
   return (
-    <ul className="divide-y">
+    <ul className="divide-y divide-border/60">
       {data.map((a) => {
         const name = a.person?.full_name || a.person?.username || "Someone";
         const isMe = a.user_id === user?.id;
         return (
-          <li key={a.id} className="flex gap-3 py-3">
-            <UserAvatar url={a.person?.avatar_url} name={name} size={32} />
+          <li key={a.id} className="flex gap-4 py-4 group">
+            <UserAvatar url={a.person?.avatar_url} name={name} size={36} />
             <div className="min-w-0 flex-1">
-              <p className="text-sm">
+              <p className="text-[15px] font-sans leading-snug">
                 {a.person ? (
                   <Link
                     to="/u/$username"
                     params={{ username: a.person.username }}
-                    className="font-semibold hover:underline"
+                    className="font-medium text-foreground hover:text-primary transition-colors duration-300"
                   >
                     {isMe ? "You" : name}
                   </Link>
                 ) : (
-                  <span className="font-semibold">{name}</span>
+                  <span className="font-medium text-foreground">{name}</span>
                 )}{" "}
                 <span className="text-muted-foreground">{a.message}</span>
               </p>
-              <div className="mt-1.5 flex flex-wrap items-center gap-1">
+              <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
                 {REACTIONS.map((r) => {
                   const count = a.reactions.filter((x) => x.reaction === r).length;
                   const mine = a.reactions.some((x) => x.reaction === r && x.user_id === user?.id);
@@ -109,17 +109,17 @@ export function ActivityFeed({ limit = 20 }: { limit?: number }) {
                       key={r}
                       onClick={() => react(a.id, r, mine)}
                       className={cn(
-                        "rounded-full border px-2 py-0.5 text-xs transition hover:bg-muted",
-                        mine && "border-primary/50 bg-primary/10",
-                        !count && "opacity-60 hover:opacity-100",
+                        "rounded-full border px-2.5 py-0.5 text-xs transition-all duration-300",
+                        mine ? "border-primary/40 bg-primary/10 text-primary" : "border-border/60 hover:border-primary/40 bg-transparent text-muted-foreground",
+                        !count && "opacity-0 group-hover:opacity-100",
                       )}
                     >
-                      {r}
-                      {count > 0 && <span className="ml-1 font-mono">{count}</span>}
+                      <span className={cn(mine && "grayscale-0", !mine && "grayscale")}>{r}</span>
+                      {count > 0 && <span className="ml-1.5 font-mono text-[10px] opacity-80">{count}</span>}
                     </button>
                   );
                 })}
-                <span className="ml-auto text-xs text-muted-foreground">
+                <span className="ml-auto font-mono text-[10px] uppercase tracking-widest text-muted-foreground/80">
                   {formatDistanceToNow(new Date(a.created_at), { addSuffix: true })}
                 </span>
               </div>

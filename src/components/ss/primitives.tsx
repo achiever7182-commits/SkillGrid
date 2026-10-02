@@ -1,26 +1,26 @@
-﻿import type { ReactNode } from "react";
-import { BookOpenCheck } from "lucide-react";
+import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <div className={cn("flex items-center gap-2.5", className)}>
-      <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-primary/30 bg-primary/15 text-primary shadow-[0_0_12px_rgba(132,204,22,0.2)]">
-        <BookOpenCheck className="size-4.5" />
+    <div className={cn("flex items-center gap-3", className)}>
+      <div className="font-display text-2xl italic font-semibold tracking-tight text-primary">
+        SkillGrid.
       </div>
-      <span className="font-display text-lg font-semibold tracking-tight">SkillGrid</span>
     </div>
   );
 }
 
-export function Panel({ className, children }: { className?: string; children: ReactNode }) {
-  return <div className={cn("glass rounded-2xl p-5", className)}>{children}</div>;
+export function Panel({ className, children, noBorder = false }: { className?: string; children: ReactNode; noBorder?: boolean }) {
+  return <div className={cn("rounded-xl p-6", !noBorder && "bg-card border border-border/60 shadow-sm", className)}>{children}</div>;
 }
 
-export function SectionTitle({ children, action }: { children: ReactNode; action?: ReactNode }) {
+export function SectionTitle({ children, action, index }: { children: ReactNode; action?: ReactNode; index?: string }) {
   return (
-    <div className="mb-4 flex items-center justify-between gap-2">
-      <h2 className="text-base font-semibold">{children}</h2>
+    <div className="mb-6 flex items-center justify-between gap-4 border-b border-border/60 pb-3">
+      <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/90">
+        {index ? `${index} — ` : ""}{children}
+      </h2>
       {action}
     </div>
   );
@@ -29,7 +29,7 @@ export function SectionTitle({ children, action }: { children: ReactNode; action
 export function ProgressRing({
   value,
   size = 140,
-  stroke = 12,
+  stroke = 3,
   children,
 }: {
   value: number;
@@ -48,7 +48,7 @@ export function ProgressRing({
           cy={size / 2}
           r={r}
           fill="none"
-          stroke="var(--color-muted)"
+          stroke="var(--color-border)"
           strokeWidth={stroke}
         />
         <circle
@@ -64,7 +64,7 @@ export function ProgressRing({
           style={{ transition: "stroke-dashoffset 700ms cubic-bezier(.2,.8,.2,1)" }}
         />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">{children}</div>
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-primary font-display font-medium">{children}</div>
     </div>
   );
 }
@@ -81,14 +81,14 @@ export function StatCard({
   icon?: ReactNode;
 }) {
   return (
-    <Panel className="flex flex-col gap-2">
-      <div className="flex items-center justify-between text-xs font-medium uppercase tracking-wider text-muted-foreground">
+    <div className="flex flex-col gap-1 py-4">
+      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
         {label}
-        {icon}
+        {icon && <span className="opacity-50">{icon}</span>}
       </div>
-      <div className="font-mono text-3xl font-semibold tabular-nums">{value}</div>
-      {sub && <div className="text-xs text-muted-foreground">{sub}</div>}
-    </Panel>
+      <div className="font-display text-5xl lg:text-6xl font-normal text-primary tracking-tight mt-2 mb-3">{value}</div>
+      {sub && <div className="text-[11px] text-muted-foreground uppercase tracking-widest font-semibold">{sub}</div>}
+    </div>
   );
 }
 
@@ -113,12 +113,12 @@ export function UserAvatar({
       alt={name ?? "avatar"}
       width={size}
       height={size}
-      className="shrink-0 rounded-full bg-muted object-cover"
+      className="shrink-0 rounded-full border border-border/50 object-cover"
       style={{ width: size, height: size }}
     />
   ) : (
     <div
-      className="grid shrink-0 place-items-center rounded-full bg-accent font-display text-xs font-semibold text-accent-foreground"
+      className="grid shrink-0 place-items-center rounded-full bg-secondary border border-border/60 font-sans text-xs font-semibold text-secondary-foreground"
       style={{ width: size, height: size }}
     >
       {initials}
@@ -138,11 +138,11 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-6 py-10 text-center">
-      {icon && <div className="text-muted-foreground">{icon}</div>}
-      <p className="font-medium">{title}</p>
-      {body && <p className="max-w-sm text-sm text-muted-foreground">{body}</p>}
-      {action && <div className="mt-2">{action}</div>}
+    <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-border/50 bg-secondary/20 px-8 py-16 text-center">
+      {icon && <div className="text-primary/60 mb-2">{icon}</div>}
+      <h3 className="font-display text-2xl font-medium text-foreground">{title}</h3>
+      {body && <p className="max-w-md text-sm text-muted-foreground leading-relaxed">{body}</p>}
+      {action && <div className="mt-4">{action}</div>}
     </div>
   );
 }

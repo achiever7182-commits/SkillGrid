@@ -52,7 +52,7 @@ export async function ensureInstances(userId: string, from: string, to?: string)
   if (from > end) return;
   const { data: tasks, error } = await supabase
     .from("tasks")
-    .select("id,title,description,subject_id,planned_minutes,days_of_week,recurring,start_date,end_date")
+    .select("*")
     .eq("user_id", userId)
     .eq("archived", false);
   if (error) throw error;

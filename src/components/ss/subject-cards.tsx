@@ -44,8 +44,8 @@ export function SubjectCards({
     <div
       className={
         compact
-          ? "grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
-          : "grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+          ? "grid gap-4 sm:grid-cols-2"
+          : "grid gap-6 sm:grid-cols-2"
       }
     >
       {cur.map((s) => {
@@ -53,23 +53,18 @@ export function SubjectCards({
         const p = prev.find((x) => x.subject_id === s.subject_id);
         const delta = p ? Math.round(pct - pctOf(p.completed, p.planned)) : null;
         return (
-          <div key={s.subject_id ?? "other"} className="rounded-xl border bg-background/40 p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 font-medium">
-                <span className="size-2.5 rounded-full" style={{ background: s.color }} />
-                {s.name}
+          <div key={s.subject_id ?? "other"} className="border-b border-border/60 pb-4">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <span className="size-2 rounded-full" style={{ backgroundColor: s.color }} />
+                <h3 className="font-display text-2xl font-medium tracking-tight text-foreground leading-none">{s.name}</h3>
               </div>
-              <span className="font-mono text-sm font-semibold tabular-nums">
+              <span className="font-mono text-lg font-medium opacity-80">
                 {Math.round(pct)}%
               </span>
             </div>
-            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
-              <div
-                className="h-full rounded-full transition-all duration-700"
-                style={{ width: `${pct}%`, background: s.color }}
-              />
-            </div>
-            <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+            
+            <div className="flex items-center justify-between text-[11px] uppercase font-bold tracking-widest text-muted-foreground mb-3">
               <span className="font-mono">
                 {hours(s.completed)} / {hours(s.planned)}h
               </span>
@@ -77,16 +72,23 @@ export function SubjectCards({
                 {s.done_tasks}/{s.total_tasks} tasks
               </span>
               {delta !== null && (
-                <span className="inline-flex items-center gap-1">
+                <span className="inline-flex items-center gap-1 opacity-80">
                   {delta >= 0 ? (
-                    <TrendingUp className="size-3" />
+                    <TrendingUp className="size-3" strokeWidth={2.5} />
                   ) : (
-                    <TrendingDown className="size-3" />
+                    <TrendingDown className="size-3" strokeWidth={2.5} />
                   )}
                   {delta >= 0 ? "+" : ""}
                   {delta}% vs last wk
                 </span>
               )}
+            </div>
+
+            <div className="h-0.5 overflow-hidden rounded-full bg-secondary">
+              <div
+                className="h-full rounded-full transition-all duration-700"
+                style={{ width: `${pct}%`, backgroundColor: s.color }}
+              />
             </div>
           </div>
         );

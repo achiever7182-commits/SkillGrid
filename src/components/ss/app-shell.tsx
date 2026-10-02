@@ -146,127 +146,132 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-16 flex-col border-r bg-sidebar px-2 py-4 md:flex lg:w-60 lg:px-4">
-        <Link to="/dashboard" className="mb-8 px-1">
+    <div className="min-h-screen bg-background">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-16 flex-col border-r border-border/60 bg-sidebar px-2 py-6 md:flex lg:w-64 lg:px-6">
+        <Link to="/dashboard" className="mb-12 px-1 flex items-center gap-2">
           <Logo className="[&>span]:hidden lg:[&>span]:inline" />
         </Link>
-        <nav className="flex flex-1 flex-col gap-1">
+        <p className="hidden lg:block text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase mb-4 px-2">Menu</p>
+        <nav className="flex flex-1 flex-col gap-1.5">
           {NAV.map((n) => (
             <Link
               key={n.to}
               to={n.to}
-              className="flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium text-muted-foreground transition hover:bg-sidebar-accent hover:text-foreground"
-              activeProps={{ className: "bg-sidebar-accent !text-foreground" }}
+              className="flex items-center gap-3 rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-secondary/50 hover:text-foreground"
+              activeProps={{ className: "bg-accent/20 !text-primary font-semibold" }}
             >
-              <n.icon className="size-4.5 shrink-0" />
+              <n.icon className="size-4 shrink-0" strokeWidth={1.5} />
               <span className="hidden lg:inline">{n.label}</span>
             </Link>
           ))}
         </nav>
         {profile && (
-          <Link
-            to="/u/$username"
-            params={{ username: profile.username }}
-            className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-sidebar-accent"
-          >
-            <UserAvatar
-              url={profile.avatar_url}
-              name={profile.full_name || profile.username}
-              size={32}
-            />
-            <div className="hidden min-w-0 lg:block">
-              <div className="truncate text-sm font-medium">
-                {profile.full_name || profile.username}
+          <div className="pt-6 border-t border-border/60 mt-auto">
+            <Link
+              to="/u/$username"
+              params={{ username: profile.username }}
+              className="flex items-center gap-3 rounded-md p-2 hover:bg-secondary/50 transition-colors"
+            >
+              <UserAvatar
+                url={profile.avatar_url}
+                name={profile.full_name || profile.username}
+                size={36}
+              />
+              <div className="hidden min-w-0 lg:block">
+                <div className="truncate text-sm font-medium text-foreground">
+                  {profile.full_name || profile.username}
+                </div>
+                <div className="truncate text-xs text-muted-foreground">@{profile.username}</div>
               </div>
-              <div className="truncate text-xs text-muted-foreground">@{profile.username}</div>
-            </div>
-          </Link>
+            </Link>
+          </div>
         )}
       </aside>
 
-      <div className="md:pl-16 lg:pl-60">
-        <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b bg-background/80 px-4 backdrop-blur md:px-8">
+      <div className="md:pl-16 lg:pl-64 flex flex-col min-h-screen">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-border/60 bg-background/95 px-4 backdrop-blur-md md:px-8">
           <Link to="/dashboard" className="md:hidden">
             <Logo />
           </Link>
           <div className="hidden md:block" />
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <Link
               to="/friends"
               search={{ tab: "requests" }}
-              className="relative grid size-9 place-items-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+              className="relative grid size-9 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               aria-label="Friend requests"
             >
-              <UserPlus className="size-4.5" />
+              <UserPlus className="size-4" strokeWidth={1.5} />
               {requests > 0 && (
                 <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-streak" />
               )}
             </Link>
             <Link
               to="/notifications"
-              className="relative grid size-9 place-items-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+              className="relative grid size-9 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               aria-label="Notifications"
             >
-              <Bell className="size-4.5" />
+              <Bell className="size-4" strokeWidth={1.5} />
               {unread > 0 && (
-                <span className="absolute right-1 top-1 grid min-w-4 place-items-center rounded-full bg-primary px-1 font-mono text-[10px] font-semibold text-primary-foreground">
+                <span className="absolute right-0.5 top-0.5 grid min-w-4 place-items-center rounded-full bg-primary px-1 font-mono text-[9px] font-semibold text-primary-foreground">
                   {unread}
                 </span>
               )}
             </Link>
             <DropdownMenu>
-              <DropdownMenuTrigger className="ml-1 rounded-full" aria-label="Account menu">
+              <DropdownMenuTrigger className="ml-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary ring-offset-2 ring-offset-background" aria-label="Account menu">
                 <UserAvatar
                   url={profile?.avatar_url}
                   name={profile?.full_name || profile?.username}
                   size={32}
                 />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuLabel className="truncate">{user?.email}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
+              <DropdownMenuContent align="end" className="w-56 rounded-xl p-2 border-border/60 shadow-sm">
+                <DropdownMenuLabel className="truncate font-normal text-xs text-muted-foreground">{user?.email}</DropdownMenuLabel>
+                <DropdownMenuSeparator className="my-1 border-border/60" />
                 {profile && (
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild className="rounded-md cursor-pointer">
                     <Link to="/u/$username" params={{ username: profile.username }}>
-                      <User className="size-4" />
+                      <User className="size-4 mr-2" strokeWidth={1.5} />
                       Profile
                     </Link>
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem asChild>
+                <DropdownMenuItem asChild className="rounded-md cursor-pointer">
                   <Link to="/settings">
-                    <Settings className="size-4" />
+                    <Settings className="size-4 mr-2" strokeWidth={1.5} />
                     Settings
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
+                <DropdownMenuItem asChild className="rounded-md cursor-pointer">
                   <Link to="/history">
-                    <History className="size-4" />
+                    <History className="size-4 mr-2" strokeWidth={1.5} />
                     Task history
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={signOut}>
-                  <LogOut className="size-4" />
+                <DropdownMenuSeparator className="my-1 border-border/60" />
+                <DropdownMenuItem onClick={signOut} className="rounded-md cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
+                  <LogOut className="size-4 mr-2" strokeWidth={1.5} />
                   Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </header>
-        <main className="mx-auto max-w-6xl px-4 pb-28 pt-6 md:px-8 md:pb-12">{children}</main>
+        <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-10 md:px-8 md:pb-16 flex-1">
+          {children}
+        </main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 flex justify-around border-t bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 flex justify-around border-t border-border/60 bg-background/95 pb-[env(safe-area-inset-bottom)] pt-1 backdrop-blur-md md:hidden">
         {MOBILE_NAV.map((n) => (
           <Link
             key={n.to}
             to={n.to}
-            className="flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] text-muted-foreground"
+            className="flex flex-1 flex-col items-center gap-1 py-2 text-[10px] font-medium text-muted-foreground transition-colors"
             activeProps={{ className: "!text-primary" }}
           >
-            <n.icon className="size-5" />
+            <n.icon className="size-5" strokeWidth={1.5} />
             {n.label}
           </Link>
         ))}
@@ -285,12 +290,12 @@ export function PageHeader({
   action?: ReactNode;
 }) {
   return (
-    <div className={cn("mb-6 flex flex-wrap items-end justify-between gap-3")}>
-      <div>
-        <h1 className="text-2xl font-semibold md:text-3xl">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
+    <div className={cn("mb-10 pb-6 border-b border-border/60 flex flex-wrap items-end justify-between gap-6")}>
+      <div className="max-w-2xl">
+        <h1 className="text-4xl md:text-5xl font-display font-medium text-foreground tracking-tight">{title}</h1>
+        {subtitle && <p className="mt-3 text-base text-muted-foreground leading-relaxed">{subtitle}</p>}
       </div>
-      {action}
+      {action && <div className="shrink-0">{action}</div>}
     </div>
   );
 }

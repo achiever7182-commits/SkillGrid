@@ -229,9 +229,9 @@ export function TaskList({
   return (
     <div>
       {isLoading ? (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {[0, 1, 2].map((k) => (
-            <div key={k} className="h-14 animate-pulse rounded-xl bg-muted" />
+            <div key={k} className="h-16 animate-pulse rounded-md bg-secondary/30" />
           ))}
         </div>
       ) : items.length === 0 ? (
@@ -240,98 +240,101 @@ export function TaskList({
           body="Add a task or adjust your weekly schedule to plan your study time."
           action={
             editable && (
-              <Button size="sm" onClick={() => setDialog({ open: true, task: null })}>
-                <Plus className="size-4" />
+              <Button size="sm" onClick={() => setDialog({ open: true, task: null })} className="rounded-md">
+                <Plus className="size-4 mr-2" />
                 Add task
               </Button>
             )
           }
         />
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-3">
           {items.map((i) => {
             const s = subj(i.subject_id);
             return (
               <li
                 key={i.id}
                 className={cn(
-                  "group flex items-center gap-3 rounded-xl border bg-background/40 px-3 py-2.5 transition-all",
-                  i.completed && "border-primary/20 bg-primary/5",
+                  "group flex items-start gap-4 rounded-md border border-border/60 bg-transparent px-5 py-4 transition-all duration-300 hover:border-border",
+                  i.completed && "border-primary/30 bg-primary/5",
                 )}
               >
                 <button
                   onClick={() => toggle.mutate(i)}
                   aria-label={i.completed ? "Mark incomplete" : "Mark complete"}
                   className={cn(
-                    "grid size-7 shrink-0 place-items-center rounded-lg border-2 transition-all active:scale-90",
+                    "grid size-5 mt-0.5 shrink-0 place-items-center rounded-sm border-2 transition-all duration-300 active:scale-90",
                     i.completed
                       ? "border-primary bg-primary text-primary-foreground"
-                      : "border-muted-foreground/40 hover:border-primary",
+                      : "border-muted-foreground/30 hover:border-primary/60 bg-transparent",
                   )}
                 >
                   <Check
                     className={cn(
-                      "size-4 transition-transform",
+                      "size-3 transition-transform",
                       i.completed ? "scale-100" : "scale-0",
                     )}
                     strokeWidth={3}
                   />
                 </button>
-                <span
-                  className="h-8 w-1 shrink-0 rounded-full"
-                  style={{ background: s?.color ?? "var(--color-muted)" }}
-                />
                 <div className="min-w-0 flex-1">
                   <div
                     className={cn(
-                      "truncate font-medium transition",
-                      i.completed && "text-muted-foreground line-through decoration-primary/60",
+                      "truncate font-display text-lg font-medium transition-colors duration-300",
+                      i.completed ? "text-muted-foreground line-through decoration-primary/40" : "text-foreground"
                     )}
                   >
                     {i.title}
                   </div>
                   {i.description && (
-                    <div className="text-xs text-muted-foreground mt-0.5 mb-0.5 line-clamp-1">
+                    <div className="text-sm text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
                       {i.description}
                     </div>
                   )}
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    {s && <span>{s.name}</span>}
-                    {i.notes && (
-                      <span className="inline-flex items-center gap-1">
-                        <NotebookPen className="size-3" />
-                        note
+                  <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground mt-3">
+                    {s && (
+                      <span className="flex items-center gap-1.5">
+                        <span className="size-1.5 rounded-full" style={{ backgroundColor: s.color }} />
+                        {s.name}
                       </span>
                     )}
+                    {i.notes && (
+                      <span className="inline-flex items-center gap-1 text-primary/80">
+                        <NotebookPen className="size-3" strokeWidth={2} />
+                        Note
+                      </span>
+                    )}
+                    <span className="ml-auto font-mono text-[11px] font-medium opacity-80">
+                      {fmtMinutes(i.planned_minutes)}
+                    </span>
                   </div>
                 </div>
-                <span className="font-mono text-sm tabular-nums text-muted-foreground">
-                  {fmtMinutes(i.planned_minutes)}
-                </span>
+                
                 {editable && (
                   <DropdownMenu>
                     <DropdownMenuTrigger
-                      className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-muted"
+                      className="grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground opacity-0 transition-all focus:opacity-100 group-hover:opacity-100 hover:bg-secondary"
                       aria-label="Task options"
                     >
                       <MoreHorizontal className="size-4" />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="rounded-lg shadow-sm border-border/60">
                       <DropdownMenuItem
                         onClick={() => {
                           setNoteFor(i);
                           setNote(i.notes ?? "");
                         }}
+                        className="rounded-md cursor-pointer"
                       >
-                        <NotebookPen className="size-4" />
+                        <NotebookPen className="size-4 mr-2" />
                         Notes
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => editTask(i)}>
-                        <Pencil className="size-4" />
+                      <DropdownMenuItem onClick={() => editTask(i)} className="rounded-md cursor-pointer">
+                        <Pencil className="size-4 mr-2" />
                         Edit task
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive" onClick={() => removeTask(i)}>
-                        <Trash2 className="size-4" />
+                      <DropdownMenuItem className="text-destructive rounded-md cursor-pointer focus:bg-destructive/10 focus:text-destructive" onClick={() => removeTask(i)}>
+                        <Trash2 className="size-4 mr-2" />
                         Delete task
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -344,13 +347,13 @@ export function TaskList({
       )}
       {editable && items.length > 0 && (
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className="mt-3 text-muted-foreground"
+          className="mt-6 w-full rounded-md border-dashed border-border/60 text-muted-foreground hover:text-foreground hover:border-border hover:bg-secondary/20"
           onClick={() => setDialog({ open: true, task: null })}
         >
-          <Plus className="size-4" />
-          Add task
+          <Plus className="size-4 mr-2" strokeWidth={1.5} />
+          Plan another task
         </Button>
       )}
       <TaskDialog
@@ -361,18 +364,19 @@ export function TaskList({
         onOpenChange={(o) => setDialog((d) => ({ ...d, open: o }))}
       />
       <Dialog open={!!noteFor} onOpenChange={(o) => !o && setNoteFor(null)}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px] rounded-xl">
           <DialogHeader>
-            <DialogTitle>Notes · {noteFor?.title}</DialogTitle>
+            <DialogTitle className="font-display font-medium text-xl">Notes Â· {noteFor?.title}</DialogTitle>
           </DialogHeader>
           <Textarea
             rows={6}
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="What did you cover? Private to you."
+            className="resize-none rounded-md border-border/60 focus-visible:ring-primary shadow-none mt-2"
           />
-          <DialogFooter>
-            <Button onClick={saveNote}>Save note</Button>
+          <DialogFooter className="mt-4">
+            <Button onClick={saveNote} className="rounded-md w-full sm:w-auto">Save note</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

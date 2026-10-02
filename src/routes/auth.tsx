@@ -114,130 +114,157 @@ function AuthPage() {
   }
 
   return (
-    <div className="relative min-h-screen grid place-items-center px-4 overflow-hidden">
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <RobotMascot lookState={lookState} success={loginSuccess} />
+    <div className="relative min-h-screen grid lg:grid-cols-2 grid-cols-1 overflow-hidden bg-background">
+      {/* Left Editorial Side */}
+      <div className="hidden lg:flex flex-col justify-center px-12 lg:px-24 bg-background z-10 relative">
+        <div className="absolute top-12 left-12 lg:top-24 lg:left-24">
+          <Logo />
+        </div>
+        <div className="max-w-md mt-16">
+          <p className="text-xs font-bold tracking-[0.15em] text-primary/80 uppercase mb-6">01 â€” Welcome</p>
+          <h1 className="font-display text-5xl lg:text-7xl font-normal leading-[1.1] text-foreground">
+            Discipline <br />
+            <span className="italic text-primary">becomes</span> <br />
+            momentum.
+          </h1>
+          <p className="mt-8 text-muted-foreground text-lg leading-relaxed max-w-sm font-sans">
+            Turn your daily effort into measurable progress. A private space designed for your continuous growth.
+          </p>
+        </div>
       </div>
 
-      <div className="w-full max-w-sm z-10 relative">
-        <Link to="/" className="mb-8 flex justify-center">
-          <Logo />
-        </Link>
-        <div className="glass rounded-2xl p-6 relative">
-          <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-full flex justify-center pointer-events-none z-10">
-            <div
-              className={`whitespace-nowrap rounded-full bg-background/80 backdrop-blur border px-3 py-1 text-xs shadow-sm transition-all duration-300 ${
-                lookState === "password"
-                  ? "translate-y-0 opacity-100"
-                  : "translate-y-2 opacity-0"
-              }`}
-            >
-              🙈 I'll look away while you type.
-            </div>
+      {/* Right Form Side */}
+      <div className="flex items-center justify-center relative bg-secondary/30">
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <RobotMascot lookState={lookState} success={loginSuccess} />
+        </div>
+
+        <div className="w-full max-w-[26rem] z-10 relative px-6 py-12 lg:p-0">
+          <div className="lg:hidden mb-12 flex justify-center">
+            <Logo />
           </div>
-          {sent ? (
-            <div className="text-center">
-              <h1 className="text-xl font-semibold">Check your email</h1>
-              <p className="mt-2 text-sm text-muted-foreground">
-                We sent a confirmation link to {f.email}. Open it to finish creating your account.
-              </p>
+          
+          <div className="bg-card/95 backdrop-blur-sm border border-border/60 rounded-xl p-8 shadow-sm relative">
+            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-full flex justify-center pointer-events-none z-10">
+              <div
+                className={`whitespace-nowrap rounded-full bg-background border border-border/50 px-4 py-1.5 text-xs text-muted-foreground shadow-sm transition-all duration-300 ${
+                  lookState === "password"
+                    ? "translate-y-0 opacity-100"
+                    : "translate-y-2 opacity-0"
+                }`}
+              >
+                ðŸ™ˆ I'll look away while you type.
+              </div>
             </div>
-          ) : (
-            <>
-              <h1 className="text-xl font-semibold">
-                {isSignup ? "Create your account" : "Welcome back"}
-              </h1>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {isSignup ? "Start tracking your study days." : "Log in to continue your streak."}
-              </p>
-              <form onSubmit={submit} className="mt-6 grid gap-3">
-                {isSignup && (
-                  <>
-                    <div className="grid gap-1.5">
-                      <Label>Full name</Label>
-                      <Input
-                        value={f.fullName}
-                        onChange={set("fullName")}
-                        onFocus={() => setLookState("email")}
-                        onBlur={() => setLookState("idle")}
-                        autoComplete="name"
-                      />
-                    </div>
-                    <div className="grid gap-1.5">
-                      <Label>Username</Label>
-                      <Input
-                        value={f.username}
-                        onChange={set("username")}
-                        onFocus={() => setLookState("email")}
-                        onBlur={() => setLookState("idle")}
-                        placeholder="kaif_codes"
-                        autoComplete="username"
-                      />
-                    </div>
-                  </>
-                )}
-                <div className="grid gap-1.5">
-                  <Label>Email</Label>
-                  <Input
-                    type="email"
-                    value={f.email}
-                    onChange={set("email")}
-                    onFocus={() => setLookState("email")}
-                    onBlur={() => setLookState("idle")}
-                    autoComplete="email"
-                    required
-                  />
-                </div>
-                <div className="grid gap-1.5">
-                  <div className="flex justify-between">
-                    <Label>Password</Label>
-                    {!isSignup && (
-                      <Link
-                        to="/forgot-password"
-                        className="text-xs text-muted-foreground hover:text-foreground"
-                      >
-                        Forgot password?
-                      </Link>
-                    )}
-                  </div>
-                  <Input
-                    type="password"
-                    value={f.password}
-                    onChange={set("password")}
-                    onFocus={() => setLookState("password")}
-                    onBlur={() => setLookState("idle")}
-                    autoComplete={isSignup ? "new-password" : "current-password"}
-                    required
-                  />
-                </div>
-                {isSignup && (
-                  <div className="grid gap-1.5">
-                    <Label>Confirm password</Label>
+            {sent ? (
+              <div className="text-center">
+                <h2 className="font-display text-2xl font-medium">Check your email</h2>
+                <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                  We sent a confirmation link to <span className="font-medium text-foreground">{f.email}</span>. Open it to finish creating your account.
+                </p>
+              </div>
+            ) : (
+              <>
+                <h2 className="font-display text-2xl font-medium text-foreground">
+                  {isSignup ? "Create your account" : "Welcome back"}
+                </h2>
+                <p className="mt-1.5 text-sm text-muted-foreground">
+                  {isSignup ? "Start tracking your study days." : "Log in to continue your streak."}
+                </p>
+                <form onSubmit={submit} className="mt-8 grid gap-4">
+                  {isSignup && (
+                    <>
+                      <div className="grid gap-2">
+                        <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Full name</Label>
+                        <Input
+                          value={f.fullName}
+                          onChange={set("fullName")}
+                          onFocus={() => setLookState("email")}
+                          onBlur={() => setLookState("idle")}
+                          autoComplete="name"
+                          className="rounded-md border-border/80 focus-visible:ring-primary shadow-none"
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Username</Label>
+                        <Input
+                          value={f.username}
+                          onChange={set("username")}
+                          onFocus={() => setLookState("email")}
+                          onBlur={() => setLookState("idle")}
+                          placeholder="kaif_codes"
+                          autoComplete="username"
+                          className="rounded-md border-border/80 focus-visible:ring-primary shadow-none"
+                        />
+                      </div>
+                    </>
+                  )}
+                  <div className="grid gap-2">
+                    <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Email</Label>
                     <Input
-                      type="password"
-                      value={f.confirm}
-                      onChange={set("confirm")}
-                      onFocus={() => setLookState("password")}
+                      type="email"
+                      value={f.email}
+                      onChange={set("email")}
+                      onFocus={() => setLookState("email")}
                       onBlur={() => setLookState("idle")}
-                      autoComplete="new-password"
+                      autoComplete="email"
+                      required
+                      className="rounded-md border-border/80 focus-visible:ring-primary shadow-none"
                     />
                   </div>
-                )}
-                <Button type="submit" className="mt-2" disabled={loading}>
-                  {loading ? "Please waitâ€¦" : isSignup ? "Create account" : "Log in"}
-                </Button>
-              </form>
-              <p className="mt-5 text-center text-sm text-muted-foreground">
-                {isSignup ? "Already have an account?" : "New to SkillGrid?"}{" "}
-                <button
-                  onClick={() => setIsSignup(!isSignup)}
-                  className="font-medium text-foreground hover:underline"
-                >
-                  {isSignup ? "Log in" : "Create account"}
-                </button>
-              </p>
-            </>
-          )}
+                  <div className="grid gap-2">
+                    <div className="flex justify-between items-center">
+                      <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Password</Label>
+                      {!isSignup && (
+                        <Link
+                          to="/forgot-password"
+                          className="text-[11px] text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider"
+                        >
+                          Forgot password?
+                        </Link>
+                      )}
+                    </div>
+                    <Input
+                      type="password"
+                      value={f.password}
+                      onChange={set("password")}
+                      onFocus={() => setLookState("password")}
+                      onBlur={() => setLookState("idle")}
+                      autoComplete={isSignup ? "new-password" : "current-password"}
+                      required
+                      className="rounded-md border-border/80 focus-visible:ring-primary shadow-none"
+                    />
+                  </div>
+                  {isSignup && (
+                    <div className="grid gap-2">
+                      <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Confirm password</Label>
+                      <Input
+                        type="password"
+                        value={f.confirm}
+                        onChange={set("confirm")}
+                        onFocus={() => setLookState("password")}
+                        onBlur={() => setLookState("idle")}
+                        autoComplete="new-password"
+                        className="rounded-md border-border/80 focus-visible:ring-primary shadow-none"
+                      />
+                    </div>
+                  )}
+                  <Button type="submit" className="mt-4 rounded-md shadow-none hover:-translate-y-[1px] transition-transform duration-300" disabled={loading}>
+                    {loading ? "Please waitâ€¦" : isSignup ? "Create account" : "Log in"}
+                  </Button>
+                </form>
+                <p className="mt-8 text-center text-sm text-muted-foreground">
+                  {isSignup ? "Already have an account?" : "New to SkillGrid?"}{" "}
+                  <button
+                    onClick={() => setIsSignup(!isSignup)}
+                    className="font-medium text-foreground hover:text-primary transition-colors underline decoration-border underline-offset-4 hover:decoration-primary"
+                  >
+                    {isSignup ? "Log in" : "Create account"}
+                  </button>
+                </p>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

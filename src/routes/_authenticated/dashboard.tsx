@@ -36,33 +36,33 @@ function Dashboard() {
   const pct = t ? dayPct(t) : 0;
   return (
     <AppShell>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-start justify-between">
         <PageHeader
-          title={`${greeting()}, ${(profile?.full_name || profile?.username || "").split(" ")[0]} ðŸ‘‹`}
+          title={<>{greeting()},<br/><span className="italic text-primary">{profile?.full_name || profile?.username || "Scholar"}</span>.</>}
           subtitle="Let's make today count."
         />
         <RewardBadge userId={user?.id} />
       </div>
-      <div className="grid gap-4 md:grid-cols-4">
-        <Panel className="flex items-center gap-4 md:col-span-1">
-          <ProgressRing value={pct} size={96} stroke={9}>
-            <span className="font-mono text-xl font-semibold">{Math.round(pct)}%</span>
+
+      <div className="grid gap-x-12 gap-y-8 md:grid-cols-4 mb-16 px-2">
+        <div className="flex items-center gap-6 md:col-span-1">
+          <ProgressRing value={pct} size={110} stroke={3}>
+            <span className="font-display text-3xl font-medium">{Math.round(pct)}%</span>
           </ProgressRing>
           <div className="text-sm">
-            <div className="text-xs uppercase tracking-wider text-muted-foreground">Today</div>
-            <div className="font-mono">
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Today</div>
+            <div className="font-mono text-base font-medium text-foreground">
               {hours(t?.completed ?? 0)} / {hours(t?.planned ?? 0)}h
             </div>
-            <div className="text-xs text-muted-foreground">
-              {t?.done_tasks ?? 0}/{t?.total_tasks ?? 0} tasks Â·{" "}
-              {Math.round(pctOf(t?.done_tasks ?? 0, t?.total_tasks ?? 0))}%
+            <div className="text-xs text-muted-foreground mt-1 font-medium">
+              {t?.done_tasks ?? 0}/{t?.total_tasks ?? 0} tasks
             </div>
           </div>
-        </Panel>
+        </div>
         <StatCard
           label="Current streak"
-          icon={<Flame className="size-4 text-streak" />}
-          value={`${p?.streak.current ?? 0}d`}
+          icon={<Flame className="size-4" />}
+          value={`${p?.streak.current ?? 0}`}
           sub={streakMessage(p?.streak.current ?? 0)}
         />
         <StatCard
@@ -75,30 +75,40 @@ function Dashboard() {
           label="Weekly progress"
           icon={<TrendingUp className="size-4" />}
           value={`${Math.round(p?.week.pct ?? 0)}%`}
-          sub={`${p?.week.done ?? 0} tasks done Â· longest streak ${p?.streak.longest ?? 0}d`}
+          sub={`${p?.week.done ?? 0} tasks done`}
         />
       </div>
-      <div className="mt-4 grid gap-4 lg:grid-cols-5">
-        <Panel className="lg:col-span-3">
-          <SectionTitle action={<ListChecks className="size-4 text-muted-foreground" />}>
-            Today's Tasks
+
+      <div className="grid gap-12 lg:grid-cols-5 mb-12">
+        <div className="lg:col-span-3">
+          <SectionTitle index="01" action={<ListChecks className="size-4 text-muted-foreground" />}>
+            Tasks
           </SectionTitle>
           <TaskList />
-        </Panel>
-        <Panel className="lg:col-span-2">
-          <SectionTitle>This week</SectionTitle>
-          {p && <WeeklyBarChart days={p.weekDays} />}
-        </Panel>
+        </div>
+        <div className="lg:col-span-2">
+          <SectionTitle index="02">This week</SectionTitle>
+          <div className="mt-8">
+            {p && <WeeklyBarChart days={p.weekDays} />}
+          </div>
+        </div>
       </div>
-      <Panel className="mt-4">
-        <SectionTitle>Subject Progress</SectionTitle>
-        <SubjectCards userId={user?.id} />
-      </Panel>
-      <Panel className="mt-4">{p && <Heatmap daily={p.daily} />}</Panel>
-      <Panel className="mt-4">
-        <SectionTitle>Friends Activity</SectionTitle>
+
+      <div className="grid gap-12 lg:grid-cols-2 mb-12">
+        <div>
+          <SectionTitle index="03">Subjects</SectionTitle>
+          <SubjectCards userId={user?.id} />
+        </div>
+        <div>
+          <SectionTitle index="04">Consistency</SectionTitle>
+          {p && <Heatmap daily={p.daily} />}
+        </div>
+      </div>
+
+      <div>
+        <SectionTitle index="05">Social</SectionTitle>
         <ActivityFeed limit={10} />
-      </Panel>
+      </div>
     </AppShell>
   );
 }
@@ -108,20 +118,16 @@ function RewardBadge({ userId }: { userId?: string }) {
   if (!rewards) return null;
 
   return (
-    <Link to="/rewards" className="group hidden md:flex items-center gap-3 rounded-xl border bg-card p-3 shadow-sm transition-all hover:border-primary/50">
-      <div className="grid place-items-center rounded-lg bg-primary/10 p-2 text-primary">
-        <Star className="size-5" />
+    <Link to="/rewards" className="group hidden md:flex items-center gap-4 rounded-full border border-border/60 bg-card/50 px-5 py-2.5 shadow-sm transition-all hover:border-primary/40 hover:bg-card">
+      <div className="grid place-items-center text-primary">
+        <Star className="size-5" strokeWidth={1.5} />
       </div>
       <div>
-        <div className="flex items-baseline gap-2">
-          <span className="font-semibold">Level {rewards.level}</span>
-          <span className="text-xs text-muted-foreground">{rewards.xp.toLocaleString()} XP</span>
+        <div className="flex items-baseline gap-2 mb-1">
+          <span className="font-display text-lg font-medium text-foreground tracking-tight">Level {rewards.level}</span>
+          <span className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{rewards.xp.toLocaleString()} XP</span>
         </div>
-        <Progress value={rewards.levelProgress} className="mt-1.5 h-1.5 w-32" />
-        <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1"><Flame className="size-3 text-streak" /> {rewards.stats?.current_streak || 0}d</span>
-          <span className="flex items-center gap-1"><Trophy className="size-3 text-yellow-500" /> {rewards.achievementsCount}</span>
-        </div>
+        <Progress value={rewards.levelProgress} className="h-1 w-32 bg-secondary" />
       </div>
     </Link>
   );

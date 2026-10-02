@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { addDays, format } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -69,20 +69,22 @@ function Analytics() {
               variant="outline"
               onClick={() => setWeekStartSelected((w) => addDays(w, -7))}
               aria-label="Previous week"
+              className="rounded-full size-8 border-border/60"
             >
-              <ChevronLeft className="size-4" />
+              <ChevronLeft className="size-4" strokeWidth={1.5} />
             </Button>
-            <span className="min-w-36 text-center text-sm font-medium">{weekLabel}</span>
+            <span className="min-w-36 text-center text-sm font-medium font-mono">{weekLabel}</span>
             <Button
               size="icon"
               variant="outline"
               onClick={() => setWeekStartSelected((w) => addDays(w, 7))}
               aria-label="Next week"
+              className="rounded-full size-8 border-border/60"
             >
-              <ChevronRight className="size-4" />
+              <ChevronRight className="size-4" strokeWidth={1.5} />
             </Button>
             {!isCurrentWeek && (
-              <Button variant="outline" size="sm" onClick={() => setWeekStartSelected(currentWs)}>
+              <Button variant="outline" size="sm" onClick={() => setWeekStartSelected(currentWs)} className="rounded-full border-border/60 px-4 ml-2">
                 This Week
               </Button>
             )}
@@ -90,7 +92,7 @@ function Analytics() {
         }
       />
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7 mb-8 mt-6">
         <StatCard label="Weekly %" value={`${Math.round(pct)}%`} />
         <StatCard label="Planned" value={`${hours(planned)}h`} />
         <StatCard label="Completed" value={`${hours(completed)}h`} />
@@ -100,27 +102,32 @@ function Analytics() {
         <StatCard label="Longest" value={`${p?.streak.longest ?? 0}d`} />
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2 mb-8">
         <Panel>
-          <SectionTitle>Daily completion</SectionTitle>
+          <SectionTitle index="01">Daily completion</SectionTitle>
           <WeeklyBarChart days={weekDays} />
         </Panel>
         <Panel>
-          <SectionTitle>Cumulative hours</SectionTitle>
+          <SectionTitle index="02">Cumulative hours</SectionTitle>
           <WeeklyLineChart days={weekDays} />
         </Panel>
       </div>
 
-      <Panel className="mt-4">
-        <SectionTitle>Subject Progress</SectionTitle>
-        <SubjectCards
-          userId={user?.id}
-          from={toStr(weekStartSelected)}
-          to={toStr(selectedWeekEnd)}
-        />
-      </Panel>
+      <div className="grid gap-6 lg:grid-cols-1 mb-8">
+        <Panel>
+          <SectionTitle index="03">Subject Progress</SectionTitle>
+          <SubjectCards
+            userId={user?.id}
+            from={toStr(weekStartSelected)}
+            to={toStr(selectedWeekEnd)}
+          />
+        </Panel>
+      </div>
 
-      <Panel className="mt-4">{p && <Heatmap daily={p.daily} />}</Panel>
+      <Panel className="mb-8">
+        <SectionTitle index="04">Consistency</SectionTitle>
+        {p && <Heatmap daily={p.daily} />}
+      </Panel>
     </AppShell>
   );
 }
