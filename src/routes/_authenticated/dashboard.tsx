@@ -47,7 +47,7 @@ function Dashboard() {
       <div className="grid gap-x-12 gap-y-8 md:grid-cols-4 mb-16 px-2">
         <div className="flex items-center gap-6 md:col-span-1">
           <ProgressRing value={pct} size={110} stroke={3}>
-            <span className="font-display text-3xl font-medium">{Math.round(pct)}%</span>
+            <span className="font-display text-3xl font-bold">{Math.round(pct)}%</span>
           </ProgressRing>
           <div className="text-sm">
             <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Today</div>
@@ -124,7 +124,7 @@ function RewardBadge({ userId }: { userId?: string }) {
       </div>
       <div>
         <div className="flex items-baseline gap-2 mb-1">
-          <span className="font-display text-lg font-medium text-foreground tracking-tight">Level {rewards.level}</span>
+          <span className="font-display text-lg font-bold text-foreground tracking-tight">Level {rewards.level}</span>
           <span className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{rewards.xp.toLocaleString()} XP</span>
         </div>
         <Progress value={rewards.levelProgress} className="h-1 w-32 bg-secondary" />

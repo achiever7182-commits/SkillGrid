@@ -97,7 +97,7 @@ function CalendarPage() {
                   !s?.planned && "bg-transparent border-border/40 hover:bg-secondary/30"
                 )}
               >
-                <span className="text-sm font-display font-medium">{format(d, "d")}</span>
+                <span className="text-sm font-display font-bold">{format(d, "d")}</span>
                 {s && s.planned > 0 && (
                   <span className="font-mono text-[10px] opacity-80 mt-1">{Math.round(pct)}%</span>
                 )}
@@ -109,7 +109,7 @@ function CalendarPage() {
       <Dialog open={!!day} onOpenChange={(o) => !o && setDay(null)}>
         <DialogContent className="max-w-xl rounded-xl">
           <DialogHeader>
-            <DialogTitle className="font-display font-medium text-2xl">{day && format(parse(day), "EEEE, MMMM d")}</DialogTitle>
+            <DialogTitle className="font-display font-bold text-2xl">{day && format(parse(day), "EEEE, MMMM d")}</DialogTitle>
           </DialogHeader>
           {sel && (
             <p className="text-sm text-muted-foreground uppercase tracking-widest font-mono text-[11px] font-bold flex items-center gap-2">

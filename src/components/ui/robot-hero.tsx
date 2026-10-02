@@ -437,6 +437,7 @@ export function RobotPrototype({
   lookState?: "idle" | "email" | "password";
   success?: boolean;
 }) {
+  const walkTimeRef = useRef(0);
   const isLovedRef = useRef(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const bodyRef = useRef<THREE.Group>(null);
@@ -461,13 +462,13 @@ export function RobotPrototype({
   };
 
   const config = {
-    moveSpeed: 0.35,
-    bodyRotSpeed: 10.0,
-    headRotSpeed: 20.0,
-    bodyTiltX: 0.0,
-    bodyTiltY: 0.95,
-    headLookX: 0.3,
-    headLookY: 1.8,
+    moveSpeed: 4.8,
+    bodyRotSpeed: 8.0,
+    headRotSpeed: 16.0,
+    bodyTiltX: 0.05,
+    bodyTiltY: 0.85,
+    headLookX: 0.45,
+    headLookY: 1.6,
   };
 
   useEffect(() => {
@@ -486,22 +487,65 @@ export function RobotPrototype({
       tx = 1.0;
       ty = 0.5;
     } else if (lookState === "email") {
-      tx = 0;
-      ty = -0.3;
+      tx = 0.0;
+      ty = -0.2;
     }
 
-    const maxMoveX = state.viewport.width / 2.2;
-    const targetPosX = tx * maxMoveX;
+    const vw = state.viewport.width;
+    const vh = state.viewport.height;
+    const isNarrow = vw < 3.4;
+
+    let targetPosX: number;
+    let targetPosY: number;
+
+    if (isNarrow) {
+      // On narrow/mobile screens, keep it above the login block so it never overlaps or goes behind
+      targetPosX = THREE.MathUtils.clamp(tx * 0.8, -0.6, 0.6);
+      targetPosY = 1.5;
+    } else {
+      // Desktop / wide screen:
+      // The login card occupies the center (x ∈ [-1.25, 1.25]).
+      // Keep robot strictly in the open area to the right of the login block with generous clearance:
+      const minX = Math.max(1.75, vw * 0.28);
+      const maxX = Math.max(minX + 0.6, vw * 0.44);
+
+      // When cursor is on the left side or over the login block (tx <= 0),
+      // the robot stays safely at minX beside the card, looking towards the cursor.
+      // When cursor moves into the right side (tx > 0), the robot walks flexibly across the right area.
+      const normalizedMouseX = Math.max(0, Math.min(1, (tx + 0.1) / 0.9));
+      targetPosX = THREE.MathUtils.lerp(minX, maxX, normalizedMouseX);
+
+      // Flexible vertical movement following cursor
+      targetPosY = THREE.MathUtils.clamp(ty * (vh * 0.28) - 0.25, -1.0, 1.0);
+    }
+
+    // Dynamic walking / hover physics
+    const currentPosX = bodyRef.current.position.x;
+    const currentPosY = bodyRef.current.position.y;
+    const dist = Math.hypot(targetPosX - currentPosX, targetPosY - currentPosY);
+    const isMoving = dist > 0.05;
+
+    walkTimeRef.current += dt * (isMoving ? 9.0 : 2.5);
+    const walkBob = Math.sin(walkTimeRef.current) * (isMoving ? 0.07 : 0.02);
+    const walkSway = Math.cos(walkTimeRef.current * 0.5) * (isMoving ? 0.05 : 0.015);
+
+    // Highly responsive, agile, flexible lerp
     bodyRef.current.position.x = THREE.MathUtils.lerp(
-      bodyRef.current.position.x,
+      currentPosX,
       targetPosX,
       config.moveSpeed * dt,
     );
+    bodyRef.current.position.y = THREE.MathUtils.lerp(
+      currentPosY,
+      targetPosY + walkBob,
+      config.moveSpeed * dt,
+    );
 
-    const relativeX = tx - bodyRef.current.position.x / 2.5;
+    // Dynamic body and head rotation tracking mouse anywhere across the entire website
+    const relativeX = tx - bodyRef.current.position.x / (vw / 2.2);
     const bodyTargetRotY = -relativeX * config.bodyTiltY;
-    const bodyTargetRotX = relativeX * relativeX * config.bodyTiltX - ty * 0.25;
-    const bodyTargetRotZ = -relativeX * 0.15;
+    const bodyTargetRotX = (isMoving ? 0.08 : 0.0) - ty * 0.15;
+    const bodyTargetRotZ = -relativeX * 0.12 + walkSway;
 
     bodyRef.current.rotation.y = THREE.MathUtils.lerp(
       bodyRef.current.rotation.y,
@@ -604,7 +648,7 @@ export function RobotPrototype({
   return (
     <group
       ref={bodyRef}
-      position={[0, -0.3, 0]}
+      position={[1.8, -0.2, 0]}
       onPointerDown={handlePointerDown}
       onPointerOver={() => (document.body.style.cursor = "pointer")}
       onPointerOut={() => (document.body.style.cursor = "auto")}

@@ -121,10 +121,10 @@ function AuthPage() {
           <Logo />
         </div>
         <div className="max-w-md mt-16">
-          <p className="text-xs font-bold tracking-[0.15em] text-primary/80 uppercase mb-6">01 â€” Welcome</p>
-          <h1 className="font-display text-5xl lg:text-7xl font-normal leading-[1.1] text-foreground">
+          <p className="text-xs font-bold tracking-[0.15em] text-primary/80 uppercase mb-6">01 — Welcome</p>
+          <h1 className="font-display text-5xl lg:text-7xl font-bold leading-[1.05] tracking-tight text-foreground">
             Discipline <br />
-            <span className="italic text-primary">becomes</span> <br />
+            <span className="text-primary">becomes</span> <br />
             momentum.
           </h1>
           <p className="mt-8 text-muted-foreground text-lg leading-relaxed max-w-sm font-sans">
@@ -135,7 +135,7 @@ function AuthPage() {
 
       {/* Right Form Side */}
       <div className="flex items-center justify-center relative bg-secondary/30">
-        <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 z-20 pointer-events-none">
           <RobotMascot lookState={lookState} success={loginSuccess} />
         </div>
 
@@ -153,19 +153,19 @@ function AuthPage() {
                     : "translate-y-2 opacity-0"
                 }`}
               >
-                ðŸ™ˆ I'll look away while you type.
+                🙈 I'll look away while you type.
               </div>
             </div>
             {sent ? (
               <div className="text-center">
-                <h2 className="font-display text-2xl font-medium">Check your email</h2>
+                <h2 className="font-display text-2xl font-bold">Check your email</h2>
                 <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
                   We sent a confirmation link to <span className="font-medium text-foreground">{f.email}</span>. Open it to finish creating your account.
                 </p>
               </div>
             ) : (
               <>
-                <h2 className="font-display text-2xl font-medium text-foreground">
+                <h2 className="font-display text-2xl font-bold text-foreground">
                   {isSignup ? "Create your account" : "Welcome back"}
                 </h2>
                 <p className="mt-1.5 text-sm text-muted-foreground">

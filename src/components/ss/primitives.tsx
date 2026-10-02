@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 export function Logo({ className }: { className?: string }) {
   return (
     <div className={cn("flex items-center gap-3", className)}>
-      <div className="font-display text-2xl italic font-semibold tracking-tight text-primary">
+      <div className="font-display text-2xl font-bold tracking-tight text-primary">
         SkillGrid.
       </div>
     </div>
@@ -64,7 +64,7 @@ export function ProgressRing({
           style={{ transition: "stroke-dashoffset 700ms cubic-bezier(.2,.8,.2,1)" }}
         />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-primary font-display font-medium">{children}</div>
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-primary font-display font-bold">{children}</div>
     </div>
   );
 }
@@ -86,7 +86,7 @@ export function StatCard({
         {label}
         {icon && <span className="opacity-50">{icon}</span>}
       </div>
-      <div className="font-display text-5xl lg:text-6xl font-normal text-primary tracking-tight mt-2 mb-3">{value}</div>
+      <div className="font-display text-5xl lg:text-6xl font-bold text-primary tracking-tight mt-2 mb-3">{value}</div>
       {sub && <div className="text-[11px] text-muted-foreground uppercase tracking-widest font-semibold">{sub}</div>}
     </div>
   );
@@ -140,7 +140,7 @@ export function EmptyState({
   return (
     <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-border/50 bg-secondary/20 px-8 py-16 text-center">
       {icon && <div className="text-primary/60 mb-2">{icon}</div>}
-      <h3 className="font-display text-2xl font-medium text-foreground">{title}</h3>
+      <h3 className="font-display text-2xl font-bold text-foreground">{title}</h3>
       {body && <p className="max-w-md text-sm text-muted-foreground leading-relaxed">{body}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>

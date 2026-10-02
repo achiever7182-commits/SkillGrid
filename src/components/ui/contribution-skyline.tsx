@@ -282,7 +282,7 @@ function Stat({
         </div>
         <div className="flex items-baseline gap-1.5">
           <span
-            className="font-display font-medium tabular-nums text-foreground transition-colors duration-500 motion-reduce:transition-none"
+            className="font-display font-bold tabular-nums text-foreground transition-colors duration-500 motion-reduce:transition-none"
             style={{ fontSize: size, lineHeight: 1 }}
           >
             {value}
@@ -1025,7 +1025,7 @@ export default function ContributionSkyline({
       {!hideHeader && (
         <header className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-x-4 gap-y-4">
           <div className="max-w-2xl">
-            <h3 className="m-0 text-2xl font-display font-medium leading-snug text-foreground">
+            <h3 className="m-0 text-2xl font-display font-bold leading-snug text-foreground">
               {title ?? "Your Consistency"}
             </h3>
             <p className="mt-1 text-sm text-muted-foreground font-sans tracking-wide">
@@ -1114,7 +1114,7 @@ export default function ContributionSkyline({
           >
             {active >= 0 && model.cells[active] ? (
               <div className="flex flex-col gap-1">
-                <div className="font-display font-medium text-[14px]">
+                <div className="font-display font-bold text-[14px]">
                   {dfy.format(dayMs(model.cells[active].date))}
                 </div>
                 <div className="font-sans text-[12px] opacity-90">

@@ -292,7 +292,7 @@ export function PageHeader({
   return (
     <div className={cn("mb-10 pb-6 border-b border-border/60 flex flex-wrap items-end justify-between gap-6")}>
       <div className="max-w-2xl">
-        <h1 className="text-4xl md:text-5xl font-display font-medium text-foreground tracking-tight">{title}</h1>
+        <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground tracking-tight">{title}</h1>
         {subtitle && <p className="mt-3 text-base text-muted-foreground leading-relaxed">{subtitle}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}

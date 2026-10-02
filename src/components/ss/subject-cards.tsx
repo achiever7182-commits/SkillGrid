@@ -57,7 +57,7 @@ export function SubjectCards({
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-3">
                 <span className="size-2 rounded-full" style={{ backgroundColor: s.color }} />
-                <h3 className="font-display text-2xl font-medium tracking-tight text-foreground leading-none">{s.name}</h3>
+                <h3 className="font-display text-2xl font-bold tracking-tight text-foreground leading-none">{s.name}</h3>
               </div>
               <span className="font-mono text-lg font-medium opacity-80">
                 {Math.round(pct)}%

@@ -280,7 +280,7 @@ export function TaskList({
                 <div className="min-w-0 flex-1">
                   <div
                     className={cn(
-                      "truncate font-display text-lg font-medium transition-colors duration-300",
+                      "truncate font-display text-lg font-semibold tracking-tight transition-colors duration-300",
                       i.completed ? "text-muted-foreground line-through decoration-primary/40" : "text-foreground"
                     )}
                   >
@@ -366,7 +366,7 @@ export function TaskList({
       <Dialog open={!!noteFor} onOpenChange={(o) => !o && setNoteFor(null)}>
         <DialogContent className="sm:max-w-[425px] rounded-xl">
           <DialogHeader>
-            <DialogTitle className="font-display font-medium text-xl">Notes Â· {noteFor?.title}</DialogTitle>
+            <DialogTitle className="font-display font-bold text-xl">Notes · {noteFor?.title}</DialogTitle>
           </DialogHeader>
           <Textarea
             rows={6}
