@@ -57,10 +57,10 @@ function AuthPage() {
     setF({ ...f, [k]: e.target.value });
 
   useEffect(() => {
-    if (authUser) {
+    if (authUser && !loginSuccess) {
       navigate({ to: "/dashboard" });
     }
-  }, [authUser, navigate]);
+  }, [authUser, navigate, loginSuccess]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -93,7 +93,6 @@ function AuthPage() {
         setLoginSuccess(true);
         sessionStorage.setItem("skillgrid_show_transition", "1");
         window.dispatchEvent(new CustomEvent("skillgrid:login-success"));
-        navigate({ to: "/dashboard" });
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Something went wrong";

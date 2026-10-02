@@ -15,6 +15,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { themeInitScript } from "@/lib/theme";
 import { PostLoginTransition } from "@/components/ui/post-login-transition";
+import { motion } from "framer-motion";
 
 import appCss from "../styles.css?url";
 
@@ -100,7 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap",
       },
     ],
   }),
@@ -147,6 +148,17 @@ function RootComponent() {
     };
   }, []);
 
+  const [slideUp, setSlideUp] = useState(false);
+  useEffect(() => {
+    if (showLoginTransition) {
+      // Trigger slide up exactly when the dashboard route mounts (2.4s)
+      const t = setTimeout(() => setSlideUp(true), 2400);
+      return () => clearTimeout(t);
+    } else {
+      setSlideUp(false);
+    }
+  }, [showLoginTransition]);
+
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
@@ -161,8 +173,15 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider delayDuration={100}>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
+          {/* Required: nested routes render here. */}
+          <motion.div
+            initial={false}
+            animate={slideUp ? { y: [8, 0], opacity: [0, 1] } : { y: 0, opacity: 1 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="contents"
+          >
+            <Outlet />
+          </motion.div>
           {showLoginTransition && (
             <PostLoginTransition
               onComplete={() => {

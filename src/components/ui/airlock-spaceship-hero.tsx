@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { ArrowDown } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -85,13 +86,9 @@ export interface AirlockHeroProps {
 
 /* --- Constants --- */
 
-// Served through jsDelivr rather than raw.githubusercontent.com: raw hands the
-// file back as application/octet-stream with nosniff, which browsers may refuse
-// to treat as video. jsDelivr sends video/mp4 and honours range requests, which
-// is what makes seeking work at all.
 const CDN = "https://cdn.jsdelivr.net/gh/yuraoak/airlock-hero-assets@main"
 const DEFAULT_VIDEO = `${CDN}/iss-hero-1080p.mp4`
-const DEFAULT_POSTER = `${CDN}/iss-hero-poster.jpg`
+const DEFAULT_POSTER = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1080&auto=format&fit=crop"
 const SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
 /** Keyboard fallback, so a reader without a wheel is never stuck. */
@@ -120,8 +117,8 @@ export default function AirlockHero({
     scrollHint = "SCROLL",
     tagline = "Everything you know fits in one half of the frame.",
     signature = false,
-    scrubDistance = 3200,
-    holdDistance = 1100,
+    scrubDistance = 1800,
+    holdDistance = 600,
     theme = "vacuum",
     skipLabel = "Skip intro",
     className,
@@ -129,6 +126,7 @@ export default function AirlockHero({
 }: AirlockHeroProps) {
     const sectionRef = useRef<HTMLDivElement>(null)
     const videoRef = useRef<HTMLVideoElement>(null)
+    const posterLayerRef = useRef<HTMLDivElement>(null)
     const titleRef = useRef<HTMLDivElement>(null)
     const hintRef = useRef<HTMLDivElement>(null)
     const taglineRef = useRef<HTMLDivElement>(null)
@@ -158,59 +156,87 @@ export default function AirlockHero({
         let locked = false
         let lockedY = 0
         let touchY = 0
-        /** Only a reader who was handed the page back can hand it over again. */
         let released = false
         let lastY = 0
+        let seekTimeout: any = null
 
         const totalDistance = scrubDistance + holdDistance
-        /** How much of the input axis the film itself occupies. */
         const scrubShare = scrubDistance / totalDistance
 
         /* --- Seeking ------------------------------------------------------- */
 
-        function seekTo(t: number) {
-            if (seeking) {
-                queued = t
-                return
+        function applyCurrentTime(targetTime: number) {
+            if (!video) return
+            try {
+                if (typeof (video as any).fastSeek === "function") {
+                    (video as any).fastSeek(targetTime)
+                } else {
+                    video.currentTime = targetTime
+                }
+            } catch (e) {
+                video.currentTime = targetTime
             }
-            seeking = true
-            video!.currentTime = t
         }
 
-        const onSeeked = () => {
+        function onSeekCompleted() {
             seeking = false
-            if (queued !== null) {
-                const t = queued
-                queued = null
-                seeking = true
-                video!.currentTime = t
+            if (seekTimeout) {
+                clearTimeout(seekTimeout)
+                seekTimeout = null
             }
+            if (queued !== null) {
+                const nextT = queued
+                queued = null
+                seekTo(nextT)
+            }
+        }
+
+        function seekTo(t: number) {
+            if (!video) return
+            if (isNaN(t) || duration <= 0) return
+
+            const targetTime = clamp(t, 0, Math.max(0, duration - 0.04))
+
+            // Avoid redundant seeks if already near target
+            if (Math.abs(video.currentTime - targetTime) < 0.02) {
+                return
+            }
+
+            if (seeking) {
+                queued = targetTime
+                return
+            }
+
+            seeking = true
+            applyCurrentTime(targetTime)
+
+            // Watchdog: If seeked event does not fire within 120ms (e.g. stalled buffer or stationary frame), recover seeking
+            if (seekTimeout) clearTimeout(seekTimeout)
+            seekTimeout = setTimeout(() => {
+                onSeekCompleted()
+            }, 120)
         }
 
         /* --- Painting ------------------------------------------------------ */
 
-        /**
-         * `p` runs 0-1 across scrubDistance *and* holdDistance together. The film
-         * only occupies the first stretch; past that everything to do with the
-         * picture is pinned at its last value and the reader is spending scroll on
-         * a held frame. Ending the moment the film does reads as an abrupt cut.
-         */
         function paint(p: number) {
             const videoP = clamp(p / scrubShare, 0, 1)
 
-            // Stop a hair short of the duration: seeking to the very end lands
-            // past the last decodable frame in some browsers and paints black.
-            if (duration > 0) seekTo(Math.min(videoP * duration, duration - 0.04))
+            if (duration > 0) {
+                seekTo(Math.min(videoP * duration, duration - 0.04))
+            }
 
             const titleAlpha = 1 - clamp(videoP / 0.35, 0, 1)
             const taglineAlpha = clamp((videoP - 0.82) / 0.18, 0, 1)
+            const zoomScale = 1 + videoP * 0.08
 
             if (videoRef.current) {
-                videoRef.current.style.transform = `scale(${1 + videoP * 0.06})`
+                videoRef.current.style.transform = `scale(${zoomScale})`
+            }
+            if (posterLayerRef.current) {
+                posterLayerRef.current.style.transform = `scale(${zoomScale})`
             }
             if (scrimRef.current) {
-                // The scrim exists to keep type legible over a daylit planet, so
-                // it comes and goes with the type instead of muting the whole shot.
                 scrimRef.current.style.opacity = String(Math.max(titleAlpha, taglineAlpha))
             }
             if (titleRef.current) {
@@ -223,8 +249,6 @@ export default function AirlockHero({
                 hintRef.current.style.opacity = moved ? "0" : "1"
             }
             if (taglineRef.current) {
-                // Mirrors the headline's blur-focus move, timed as the payoff
-                // once the reveal is nearly done.
                 const t = taglineAlpha
                 taglineRef.current.style.opacity = String(t)
                 taglineRef.current.style.transform = `translateY(${(1 - t) * 20}px) scale(${0.97 + t * 0.03})`
@@ -239,6 +263,7 @@ export default function AirlockHero({
 
         function engageLock() {
             if (locked) return
+            if (window.scrollY > 100) return
             locked = true
             released = false
             lockedY = window.scrollY
@@ -272,18 +297,13 @@ export default function AirlockHero({
             releaseLock()
         }
 
-        /**
-         * Spends a gesture on the scrub. Returns true when the hero used it,
-         * which is the caller's cue to swallow the event. Once the scrub is
-         * finished and the reader is still pushing forward, the page is handed
-         * back and the gesture falls through untouched.
-         */
         function consume(deltaY: number) {
             if (!locked) return false
-            // Wait for the picture to catch up with the input before letting go,
-            // otherwise a single hard flick throws the page on a half-played shot.
-            if (target >= 1 && shown > 0.98 && deltaY > 0) {
+            if (target >= 0.95 && deltaY > 0) {
                 releaseLock()
+                return false
+            }
+            if (target <= 0 && deltaY < 0) {
                 return false
             }
             target = clamp(target + deltaY / totalDistance, 0, 1)
@@ -314,42 +334,48 @@ export default function AirlockHero({
             if (consume(step)) e.preventDefault()
         }
 
-        /**
-         * Climbing back into the hero takes the lock again, at the last frame,
-         * so the sequence runs backwards. Direction matters: sitting at the top
-         * of the page is not on its own a reason to seize the wheel, or the hero
-         * would grab it the moment it mounts.
-         */
         const onScroll = () => {
             if (locked || !released) return
             const y = window.scrollY
             const climbing = y < lastY
             lastY = y
-            if (climbing && y <= section!.offsetTop) {
+            if (climbing && y <= section!.offsetTop + 5) {
                 target = shown = 1
                 paint(1)
                 engageLock()
             }
         }
 
-        /* --- Wiring -------------------------------------------------------- */
+        /* --- Media Ready Wiring -------------------------------------------- */
 
-        const onLoadedData = () => {
-            duration = video!.duration || 0
+        const updateMediaReady = () => {
+            if (video.duration && !isNaN(video.duration) && video.duration > 0) {
+                duration = video.duration
+            }
             setReady(true)
             if (reduceMotion) {
-                // Hold the payoff frame and leave the page alone.
                 target = shown = 1
                 moved = true
                 paint(1)
             }
         }
 
-        video.addEventListener("loadeddata", onLoadedData)
-        video.addEventListener("seeked", onSeeked)
+        if (video.readyState >= 1) {
+            updateMediaReady()
+        }
+
+        video.addEventListener("loadedmetadata", updateMediaReady)
+        video.addEventListener("loadeddata", updateMediaReady)
+        video.addEventListener("canplay", updateMediaReady)
+        video.addEventListener("seeked", onSeekCompleted)
+        video.addEventListener("error", () => {
+            setReady(true)
+        })
 
         if (!reduceMotion) {
-            if (window.scrollY <= section.offsetTop + 1) engageLock()
+            if (window.scrollY <= section.offsetTop + 10) {
+                engageLock()
+            }
 
             window.addEventListener("wheel", onWheel, { passive: false })
             window.addEventListener("touchstart", onTouchStart, { passive: true })
@@ -358,7 +384,7 @@ export default function AirlockHero({
             window.addEventListener("scroll", onScroll, { passive: true })
 
             const frame = () => {
-                shown += (target - shown) * 0.18
+                shown += (target - shown) * 0.2
                 paint(shown)
                 rafId = requestAnimationFrame(frame)
             }
@@ -366,8 +392,11 @@ export default function AirlockHero({
         }
 
         return () => {
-            video.removeEventListener("loadeddata", onLoadedData)
-            video.removeEventListener("seeked", onSeeked)
+            if (seekTimeout) clearTimeout(seekTimeout)
+            video.removeEventListener("loadedmetadata", updateMediaReady)
+            video.removeEventListener("loadeddata", updateMediaReady)
+            video.removeEventListener("canplay", updateMediaReady)
+            video.removeEventListener("seeked", onSeekCompleted)
             window.removeEventListener("wheel", onWheel)
             window.removeEventListener("touchstart", onTouchStart)
             window.removeEventListener("touchmove", onTouchMove)
@@ -381,9 +410,25 @@ export default function AirlockHero({
     return (
         <div
             ref={sectionRef}
-            className={cn("relative h-[100dvh] w-full overflow-hidden", className)}
+            className={cn("relative h-[100dvh] w-full overflow-hidden select-none", className)}
             style={{ background: palette.backdrop, ...style }}
         >
+            {/* Cinematic background poster layer: always visible so it's never a pitch black screen */}
+            {posterSrc && (
+                <div
+                    ref={posterLayerRef}
+                    className="absolute inset-0 bg-cover bg-center transition-all duration-700 pointer-events-none"
+                    style={{
+                        backgroundImage: `url(${posterSrc})`,
+                        opacity: ready ? 0.35 : 0.85,
+                        filter: "brightness(0.7) contrast(1.1)",
+                        transformOrigin: "center center",
+                        willChange: "transform",
+                    }}
+                />
+            )}
+
+            {/* Video element */}
             <video
                 ref={videoRef}
                 src={videoSrc}
@@ -401,18 +446,16 @@ export default function AirlockHero({
                 }}
             />
 
-            {/* Top and bottom falloff, so type never fights the sky. */}
+            {/* Gradient vignetting */}
             <div
                 className="pointer-events-none absolute inset-0"
                 style={{
                     background:
-                        "linear-gradient(180deg, rgba(5,7,13,0.38), rgba(5,7,13,0) 30%, rgba(5,7,13,0.15) 70%, rgba(5,7,13,0.58))",
+                        "linear-gradient(180deg, rgba(5,7,13,0.42), rgba(5,7,13,0) 30%, rgba(5,7,13,0.2) 70%, rgba(5,7,13,0.65))",
                 }}
             />
 
-            {/* Centre scrim. The daylit half of the planet is bright enough to
-                swallow white type without it. Driven by paint(), so it is only
-                there while there is type to protect. */}
+            {/* Centre scrim */}
             <div
                 ref={scrimRef}
                 className="pointer-events-none absolute inset-0"
@@ -422,6 +465,7 @@ export default function AirlockHero({
                 }}
             />
 
+            {/* Title */}
             <div
                 ref={titleRef}
                 className="pointer-events-none absolute inset-0 flex items-center justify-center px-[6%] text-center"
@@ -432,7 +476,7 @@ export default function AirlockHero({
                         fontFamily: SANS,
                         fontSize: "clamp(30px, 7vw, 96px)",
                         color: palette.text,
-                        textShadow: "0 4px 30px rgba(0,0,0,0.55)",
+                        textShadow: "0 4px 30px rgba(0,0,0,0.65)",
                         willChange: "transform, filter, opacity",
                     }}
                 >
@@ -440,6 +484,7 @@ export default function AirlockHero({
                 </h1>
             </div>
 
+            {/* Tagline */}
             {tagline ? (
                 <div
                     ref={taglineRef}
@@ -452,7 +497,7 @@ export default function AirlockHero({
                             fontSize: "clamp(20px, 3.4vw, 40px)",
                             lineHeight: 1.2,
                             color: palette.text,
-                            textShadow: "0 4px 24px rgba(0,0,0,0.6)",
+                            textShadow: "0 4px 24px rgba(0,0,0,0.7)",
                         }}
                     >
                         {tagline}
@@ -460,9 +505,11 @@ export default function AirlockHero({
                 </div>
             ) : null}
 
+            {/* Scroll Hint & Down Arrow (Clickable to jump right in) */}
             <div
                 ref={hintRef}
-                className="pointer-events-none absolute bottom-[clamp(20px,6vh,48px)] left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 transition-opacity duration-[400ms]"
+                onClick={() => releaseRef.current()}
+                className="cursor-pointer absolute bottom-[clamp(20px,6vh,48px)] left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 transition-opacity duration-[400ms] hover:opacity-100 z-10"
                 style={{
                     color: palette.muted,
                     fontFamily: SANS,
@@ -472,38 +519,34 @@ export default function AirlockHero({
                 }}
             >
                 <span>{scrollHint}</span>
-                <svg width="14" height="18" viewBox="0 0 14 18" aria-hidden="true" style={{ animation: "airlock-bounce 1.6s ease-in-out infinite" }}>
-                    <style>{`
-                        @keyframes airlock-bounce {
-                            0%, 100% { transform: translateY(0); opacity: 0.5; }
-                            50% { transform: translateY(5px); opacity: 1; }
-                        }
-                        @media (prefers-reduced-motion: reduce) {
-                            [style*="airlock-bounce"] { animation: none !important; }
-                        }
-                    `}</style>
-                    <path
-                        d="M7 1 L7 17 M2 12 L7 17 L12 12"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                </svg>
+                <style>{`
+                    @keyframes airlock-bounce {
+                        0%, 100% { transform: translateY(0); opacity: 0.5; }
+                        50% { transform: translateY(5px); opacity: 1; }
+                    }
+                    @media (prefers-reduced-motion: reduce) {
+                        [style*="airlock-bounce"] { animation: none !important; }
+                    }
+                `}</style>
+                <ArrowDown 
+                    size={18}
+                    strokeWidth={1.5} 
+                    aria-hidden="true" 
+                    style={{ animation: "airlock-bounce 1.6s ease-in-out infinite" }} 
+                />
             </div>
 
-            {/* Never trap anyone: a keyboard-reachable way straight to the page. */}
+            {/* Quick Skip Button */}
             <button
                 type="button"
                 onClick={() => releaseRef.current()}
-                className="absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full px-4 py-2 text-xs font-semibold opacity-0 transition-opacity focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-                style={{ fontFamily: SANS, color: palette.text, background: "rgba(5,7,13,0.7)", letterSpacing: "0.08em" }}
+                className="absolute left-1/2 top-5 z-20 -translate-x-1/2 rounded-full px-4 py-1.5 text-[11px] font-semibold tracking-wider text-muted-foreground bg-black/40 hover:bg-black/70 hover:text-white border border-white/10 backdrop-blur-md transition-all cursor-pointer"
+                style={{ fontFamily: SANS }}
             >
                 {skipLabel}
             </button>
 
-            {/* Thin progress line — fills as the video advances. */}
+            {/* Progress line */}
             <div className="absolute inset-x-0 bottom-0 h-0.5" style={{ background: "rgba(255,255,255,0.12)" }}>
                 <div
                     ref={barRef}

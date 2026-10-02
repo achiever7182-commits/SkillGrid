@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, useEffect } from "react";
+import { useMemo, useRef, useState, useEffect, Component, ReactNode, ErrorInfo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, ContactShadows } from "@react-three/drei";
 import * as THREE from "three";
@@ -500,8 +500,8 @@ export function RobotPrototype({
 
     if (isNarrow) {
       // On narrow/mobile screens, keep it centered above the login block
-      targetPosX = THREE.MathUtils.clamp(tx * 0.8, -0.6, 0.6);
-      targetPosY = 1.5;
+      targetPosX = THREE.MathUtils.clamp(tx * 0.4, -0.4, 0.4);
+      targetPosY = 0.2;
     } else {
       // Full-screen desktop view:
       // The login card is centered in the right column at x = +vw * 0.25.
@@ -752,23 +752,264 @@ export function RobotPrototype({
   );
 }
 
+export function LuxuryMascotFallback({
+  lookState,
+  success,
+}: {
+  lookState: 'idle' | 'email' | 'password';
+  success: boolean;
+}) {
+  const [mouse, setMouse] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth) * 2 - 1;
+      const y = (e.clientY / window.innerHeight) * 2 - 1;
+      setMouse({ x, y });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  // Compute head and eye offsets based on state and mouse
+  let targetTiltY = mouse.x * 16;
+  let targetTiltX = -mouse.y * 12;
+  let eyeOffsetX = mouse.x * 6;
+  let eyeOffsetY = mouse.y * 4;
+
+  if (lookState === "email") {
+    targetTiltY = 22;
+    targetTiltX = 6;
+    eyeOffsetX = 12;
+    eyeOffsetY = 2;
+  } else if (lookState === "password") {
+    targetTiltY = -28;
+    targetTiltX = -12;
+    eyeOffsetX = -14;
+    eyeOffsetY = -4;
+  }
+
+  return (
+    <div className="absolute inset-0 flex items-center justify-center lg:justify-start lg:pl-[18vw] pointer-events-none z-10">
+      <style>{`
+        @keyframes mascotHover {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-12px); }
+        }
+        @keyframes mascotShadow {
+          0%, 100% { transform: scale(1); opacity: 0.45; }
+          50% { transform: scale(0.85); opacity: 0.22; }
+        }
+        @keyframes mascotBlink {
+          0%, 92%, 100% { transform: scaleY(1); }
+          95% { transform: scaleY(0.08); }
+        }
+        @keyframes heartPulse {
+          0%, 100% { transform: scale(1.1); filter: drop-shadow(0 0 10px #ff3366); }
+          50% { transform: scale(1.35); filter: drop-shadow(0 0 18px #ff6699); }
+        }
+      `}</style>
+
+      <div className="relative flex flex-col items-center">
+        {/* Floating Robot Body & Head Container */}
+        <div 
+          className="relative transition-transform duration-300 ease-out"
+          style={{ 
+            animation: "mascotHover 3.4s ease-in-out infinite",
+            transform: `perspective(700px) rotateY(${targetTiltY}deg) rotateX(${targetTiltX}deg)`,
+          }}
+        >
+          {/* Head & Ear Antennas Group */}
+          <div className="relative flex items-center justify-center z-20">
+            {/* Left Ear Antenna */}
+            <div className="absolute -left-5 top-7 flex flex-col items-center">
+              <div 
+                className="w-2.5 h-2.5 rounded-full mb-1 transition-all duration-300"
+                style={{ 
+                  backgroundColor: success ? "#ff3366" : "#ff3366",
+                  boxShadow: "0 0 10px #ff3366",
+                }} 
+              />
+              <div className="w-2.5 h-8 rounded-full bg-gradient-to-b from-neutral-300 to-neutral-600 border border-neutral-400/40 shadow-sm" />
+            </div>
+
+            {/* Right Ear Antenna */}
+            <div className="absolute -right-5 top-7 flex flex-col items-center">
+              <div 
+                className="w-2.5 h-2.5 rounded-full mb-1 transition-all duration-300"
+                style={{ 
+                  backgroundColor: success ? "#ff3366" : "#ff3366",
+                  boxShadow: "0 0 10px #ff3366",
+                }} 
+              />
+              <div className="w-2.5 h-8 rounded-full bg-gradient-to-b from-neutral-300 to-neutral-600 border border-neutral-400/40 shadow-sm" />
+            </div>
+
+            {/* Head Dome */}
+            <div 
+              className="relative w-36 h-28 rounded-[2.2rem] flex items-center justify-center shadow-2xl transition-all duration-500 overflow-hidden"
+              style={{
+                background: "radial-gradient(circle at 45% 30%, #323338 0%, #17181c 65%, #0c0d10 100%)",
+                boxShadow: "0 0 28px rgba(255, 51, 102, 0.4), inset 0 2px 5px rgba(255, 255, 255, 0.25)",
+                border: "2px solid rgba(255, 51, 102, 0.35)",
+              }}
+            >
+              {/* Visor Glass Curvature Gloss Highlight */}
+              <div className="absolute top-1 inset-x-3 h-7 rounded-t-full bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
+
+              {/* Face Display Screen */}
+              <div 
+                className="relative flex items-center gap-5 transition-transform duration-200"
+                style={{
+                  transform: `translate(${eyeOffsetX}px, ${eyeOffsetY}px)`,
+                }}
+              >
+                {success ? (
+                  // Heart Eyes on Success
+                  <div className="flex items-center gap-5" style={{ animation: "heartPulse 1.2s ease-in-out infinite" }}>
+                    <svg className="w-7 h-7 text-[#ff3366]" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <svg className="w-7 h-7 text-[#ff3366]" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                  </div>
+                ) : lookState === "password" ? (
+                  // Shy / Looking Away Squint Eyes
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center gap-5">
+                      <div className="w-5 h-2.5 border-t-[3.5px] border-[#ff3366] rounded-t-full shadow-[0_0_10px_#ff3366]" />
+                      <div className="w-5 h-2.5 border-t-[3.5px] border-[#ff3366] rounded-t-full shadow-[0_0_10px_#ff3366]" />
+                    </div>
+                    {/* Blushing cheeks */}
+                    <div className="flex items-center gap-8 mt-1.5 opacity-80">
+                      <div className="w-3.5 h-1.5 rounded-full bg-[#ff3366]/60 blur-[1px]" />
+                      <div className="w-3.5 h-1.5 rounded-full bg-[#ff3366]/60 blur-[1px]" />
+                    </div>
+                  </div>
+                ) : (
+                  // Normal Digital Glowing Eyes with Blink
+                  <div 
+                    className="flex items-center gap-6"
+                    style={{ animation: "mascotBlink 3.8s ease-in-out infinite" }}
+                  >
+                    <div 
+                      className="w-3.5 h-6 rounded-full bg-[#ff3366] shadow-[0_0_14px_#ff3366] border border-white/40 transition-all duration-300"
+                      style={{
+                        transform: lookState === "email" ? "scale(1.15)" : "scale(1)",
+                      }}
+                    />
+                    <div 
+                      className="w-3.5 h-6 rounded-full bg-[#ff3366] shadow-[0_0_14px_#ff3366] border border-white/40 transition-all duration-300"
+                      style={{
+                        transform: lookState === "email" ? "scale(1.15)" : "scale(1)",
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Neck Collar Joint */}
+          <div className="relative -mt-2 mx-auto w-24 h-4 rounded-full bg-gradient-to-r from-neutral-800 via-neutral-600 to-neutral-800 border border-neutral-700 shadow-inner z-10" />
+
+          {/* Spherical Pearlescent Chassis Body */}
+          <div 
+            className="relative -mt-2 w-48 h-44 rounded-full shadow-2xl overflow-hidden border border-white/40"
+            style={{
+              background: "radial-gradient(circle at 35% 28%, #ffffff 0%, #f4f0e9 40%, #ddd6cb 75%, #b2aba0 100%)",
+              boxShadow: "0 18px 38px rgba(0, 0, 0, 0.45), inset 0 2px 8px rgba(255, 255, 255, 0.9)",
+            }}
+          >
+            {/* Soft Ambient Rim Reflection */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/40 pointer-events-none" />
+            {/* Subtle Chest Status Glow */}
+            <div className="absolute top-6 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-[#ff3366]/40 blur-[1px]" />
+          </div>
+        </div>
+
+        {/* Dynamic Ground Contact Shadow */}
+        <div 
+          className="mt-6 w-36 h-4 rounded-full bg-black/50 blur-md transition-all duration-300"
+          style={{ animation: "mascotShadow 3.4s ease-in-out infinite" }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function checkWebGLSupport(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const canvas = document.createElement("canvas");
+    const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+    return Boolean(gl && (gl as any) instanceof WebGLRenderingContext);
+  } catch (e) {
+    return false;
+  }
+}
+
+class ErrorBoundary extends Component<{fallback: ReactNode; children: ReactNode}, {hasError: boolean}> {
+  constructor(props: {fallback: ReactNode; children: ReactNode}) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.warn("WebGL robot canvas failed, displaying luxury interactive mascot fallback:", error.message);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
+}
+
 export function RobotMascot({ lookState, success }: { lookState: 'idle' | 'email' | 'password', success: boolean }) {
+  const [hasWebGL, setHasWebGL] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setHasWebGL(checkWebGLSupport());
+  }, []);
+
+  const fallbackUI = <LuxuryMascotFallback lookState={lookState} success={success} />;
+
+  // If WebGL is definitely not supported, render luxury fallback directly (avoids any console errors)
+  if (hasWebGL === false) {
+    return (
+      <div className="w-full h-full relative pointer-events-none">
+        {fallbackUI}
+      </div>
+    );
+  }
+
   return (
     <div className="w-full h-full relative pointer-events-none">
-      <Canvas 
-        shadows 
-        camera={{ position: [0, 0.5, 6], fov: 40 }}
-        eventSource={typeof window !== "undefined" ? document.body : undefined}
-        eventPrefix="client"
-      >
-        <ambientLight intensity={1.5} color="#ffffff" />
-        <directionalLight position={[0, 6, 3]} intensity={1.2} castShadow />
-        <Environment preset="studio" blur={0.5} />
-        <group scale={1.0}>
-          <ContactShadows position={[0, -0.7, 0]} opacity={0.6} scale={20} blur={1.5} />
-          <RobotPrototype lookState={lookState} success={success} color="#e0e0e0" pantallaColor="#ff3366" />
-        </group>
-      </Canvas>
+      <ErrorBoundary fallback={fallbackUI}>
+        <Canvas 
+          shadows 
+          gl={{ powerPreference: "default", failIfMajorPerformanceCaveat: false, antialias: true, alpha: true }}
+          camera={{ position: [0, 0.5, 6], fov: 40 }}
+          eventSource={typeof window !== "undefined" ? document.body : undefined}
+          eventPrefix="client"
+        >
+          <ambientLight intensity={1.5} color="#ffffff" />
+          <directionalLight position={[0, 6, 3]} intensity={1.2} castShadow />
+          <Environment preset="studio" blur={0.5} />
+          <group scale={1.0}>
+            <ContactShadows position={[0, -0.7, 0]} opacity={0.6} scale={20} blur={1.5} />
+            <RobotPrototype lookState={lookState} success={success} color="#e0e0e0" pantallaColor="#ff3366" />
+          </group>
+        </Canvas>
+      </ErrorBoundary>
     </div>
   );
 }

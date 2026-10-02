@@ -1,7 +1,9 @@
-﻿import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Flame, ListChecks, Lock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ss/primitives";
+
+import AirlockHero from "@/components/ui/airlock-spaceship-hero";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -30,9 +32,8 @@ function Landing() {
   });
   const lv = ["bg-heat-0", "bg-heat-1", "bg-heat-2", "bg-heat-3", "bg-heat-4"];
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      <div className="bg-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
-      <header className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+    <div className="w-full min-h-screen bg-background">
+      <header className="fixed top-0 left-0 right-0 z-50 mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <Logo />
         <div className="flex gap-2">
           <Button variant="ghost" asChild>
@@ -45,6 +46,13 @@ function Landing() {
           </Button>
         </div>
       </header>
+
+      <AirlockHero
+        title="SKILLGRID OPENS"
+        tagline="Everything you need to master your studies, right here."
+      />
+      <div className="relative overflow-hidden pt-24">
+        <div className="bg-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
       <main className="relative mx-auto max-w-6xl px-6 pb-24 pt-16 md:pt-24">
         <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-primary">
           For students who show up daily
@@ -110,6 +118,7 @@ function Landing() {
           ))}
         </div>
       </main>
+    </div>
     </div>
   );
 }
