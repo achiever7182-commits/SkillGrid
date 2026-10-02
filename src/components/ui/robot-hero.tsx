@@ -708,17 +708,17 @@ export function RobotMascot({ lookState, success }: { lookState: 'idle' | 'email
     <div className="w-full h-full relative pointer-events-none">
       <Canvas 
         shadows 
-        camera={{ position: [0, 1, 9], fov: 40 }}
+        camera={{ position: [0, 0.5, 5], fov: 40 }}
         eventSource={typeof window !== "undefined" ? document.body : undefined}
         eventPrefix="client"
       >
-        <ambientLight intensity={1} color="#ffffff" />
-        <directionalLight position={[0, 6, 3]} intensity={1} castShadow />
+        <ambientLight intensity={1.5} color="#ffffff" />
+        <directionalLight position={[0, 6, 3]} intensity={1.2} castShadow />
         <Environment preset="studio" blur={0.5} />
-        <ResponsiveGroup scale={3.5}>
-          <ContactShadows position={[0, -0.7, 0]} opacity={0.5} scale={15} blur={1} />
+        <group scale={6}>
+          <ContactShadows position={[0, -0.7, 0]} opacity={0.6} scale={20} blur={1.5} />
           <RobotPrototype lookState={lookState} success={success} color="#e0e0e0" pantallaColor="#ff3366" />
-        </ResponsiveGroup>
+        </group>
       </Canvas>
     </div>
   );
