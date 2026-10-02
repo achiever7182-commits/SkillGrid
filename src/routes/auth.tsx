@@ -116,7 +116,7 @@ function AuthPage() {
   return (
     <div className="relative min-h-screen grid lg:grid-cols-2 grid-cols-1 overflow-hidden bg-background">
       {/* Left Editorial Side */}
-      <div className="hidden lg:flex flex-col justify-center px-12 lg:px-24 bg-background z-10 relative">
+      <div className="hidden lg:flex flex-col justify-center px-12 lg:px-24 bg-transparent z-10 relative">
         <div className="absolute top-12 left-12 lg:top-24 lg:left-24">
           <Logo />
         </div>

@@ -484,11 +484,11 @@ export function RobotPrototype({
     let ty = state.pointer.y;
 
     if (lookState === "password") {
-      tx = 1.0;
+      tx = -1.0;
       ty = 0.5;
     } else if (lookState === "email") {
-      tx = 0.0;
-      ty = -0.2;
+      tx = 0.5;
+      ty = -0.1;
     }
 
     const vw = state.viewport.width;
@@ -504,15 +504,14 @@ export function RobotPrototype({
       targetPosY = 1.5;
     } else {
       // Desktop / wide screen:
-      // The login card occupies the center (x ∈ [-1.25, 1.25]).
-      // Keep robot strictly in the open area to the right of the login block with generous clearance:
-      const minX = Math.max(1.75, vw * 0.28);
-      const maxX = Math.max(minX + 0.6, vw * 0.44);
+      // Position robot on the OPPOSITE (left) side of the login block:
+      // Card occupies the center (x ∈ [-1.25, 1.25]).
+      // maxX keeps it safely to the left of the card without touching or going behind:
+      const maxX = -Math.max(1.7, vw * 0.28);
+      const minX = -Math.max(2.1, vw * 0.44);
 
-      // When cursor is on the left side or over the login block (tx <= 0),
-      // the robot stays safely at minX beside the card, looking towards the cursor.
-      // When cursor moves into the right side (tx > 0), the robot walks flexibly across the right area.
-      const normalizedMouseX = Math.max(0, Math.min(1, (tx + 0.1) / 0.9));
+      // When cursor moves, robot walks flexibly within [minX, maxX] on the left of the card
+      const normalizedMouseX = Math.max(0, Math.min(1, (tx + 1.0) / 1.5));
       targetPosX = THREE.MathUtils.lerp(minX, maxX, normalizedMouseX);
 
       // Flexible vertical movement following cursor
@@ -648,7 +647,7 @@ export function RobotPrototype({
   return (
     <group
       ref={bodyRef}
-      position={[1.8, -0.2, 0]}
+      position={[-1.8, -0.2, 0]}
       onPointerDown={handlePointerDown}
       onPointerOver={() => (document.body.style.cursor = "pointer")}
       onPointerOut={() => (document.body.style.cursor = "auto")}
