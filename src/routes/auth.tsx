@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -14,14 +14,14 @@ export const Route = createFileRoute("/auth")({
     s["mode"] === "signup" ? { mode: "signup" } : {},
   head: () => ({
     meta: [
-      { title: "Log in or sign up — StudySync" },
+      { title: "Log in or sign up â€” SkillGrid" },
       {
         name: "description",
         content:
-          "Log in to StudySync or create a free account to start tracking your study progress.",
+          "Log in to SkillGrid or create a free account to start tracking your study progress.",
       },
-      { property: "og:title", content: "Log in or sign up — StudySync" },
-      { property: "og:description", content: "Log in to StudySync or create a free account." },
+      { property: "og:title", content: "Log in or sign up â€” SkillGrid" },
+      { property: "og:description", content: "Log in to SkillGrid or create a free account." },
     ],
   }),
   component: AuthPage,
@@ -34,7 +34,7 @@ const signupSchema = z
       .string()
       .trim()
       .toLowerCase()
-      .regex(/^[a-z0-9_]{3,24}$/, "Username: 3–24 letters, numbers or _"),
+      .regex(/^[a-z0-9_]{3,24}$/, "Username: 3â€“24 letters, numbers or _"),
     email: z.string().trim().email("Enter a valid email").max(255),
     password: z.string().min(8, "Password must be at least 8 characters").max(72),
     confirm: z.string(),
@@ -92,7 +92,7 @@ function AuthPage() {
         msg.toLowerCase().includes("signups not allowed")
       ) {
         toast.error(
-          "Email signups are disabled in your Supabase project. Enable 'Allow new users to sign up' in Supabase Dashboard → Authentication → Providers → Email.",
+          "Email signups are disabled in your Supabase project. Enable 'Allow new users to sign up' in Supabase Dashboard â†’ Authentication â†’ Providers â†’ Email.",
           {
             duration: 8000,
           },
@@ -187,11 +187,11 @@ function AuthPage() {
                   </div>
                 )}
                 <Button type="submit" className="mt-2" disabled={loading}>
-                  {loading ? "Please wait…" : isSignup ? "Create account" : "Log in"}
+                  {loading ? "Please waitâ€¦" : isSignup ? "Create account" : "Log in"}
                 </Button>
               </form>
               <p className="mt-5 text-center text-sm text-muted-foreground">
-                {isSignup ? "Already have an account?" : "New to StudySync?"}{" "}
+                {isSignup ? "Already have an account?" : "New to SkillGrid?"}{" "}
                 <button
                   onClick={() => setIsSignup(!isSignup)}
                   className="font-medium text-foreground hover:underline"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { addDays, format } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -16,9 +16,9 @@ import { hours, toStr, weekStart } from "@/lib/dates";
 export const Route = createFileRoute("/_authenticated/analytics")({
   head: () => ({
     meta: [
-      { title: "Analytics — StudySync" },
+      { title: "Analytics â€” SkillGrid" },
       { name: "description", content: "Weekly and subject study analytics." },
-      { property: "og:title", content: "Analytics — StudySync" },
+      { property: "og:title", content: "Analytics â€” SkillGrid" },
       { property: "og:description", content: "Weekly study analytics." },
     ],
   }),
@@ -33,7 +33,7 @@ function Analytics() {
   const currentWs = weekStart();
   const isCurrentWeek = toStr(weekStartSelected) === toStr(currentWs);
   const selectedWeekEnd = addDays(weekStartSelected, 6);
-  const weekLabel = `${format(weekStartSelected, "MMM d")} – ${format(selectedWeekEnd, "MMM d, yyyy")}`;
+  const weekLabel = `${format(weekStartSelected, "MMM d")} â€“ ${format(selectedWeekEnd, "MMM d, yyyy")}`;
 
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const d = toStr(addDays(weekStartSelected, i));

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+﻿import type { ReactNode } from "react";
 import { BookOpenCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -8,7 +8,7 @@ export function Logo({ className }: { className?: string }) {
       <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-primary/30 bg-primary/15 text-primary shadow-[0_0_12px_rgba(132,204,22,0.2)]">
         <BookOpenCheck className="size-4.5" />
       </div>
-      <span className="font-display text-lg font-semibold tracking-tight">StudySync</span>
+      <span className="font-display text-lg font-semibold tracking-tight">SkillGrid</span>
     </div>
   );
 }

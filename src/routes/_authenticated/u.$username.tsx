@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Lock } from "lucide-react";
 import { AppShell } from "@/components/ss/app-shell";
@@ -12,10 +12,10 @@ import { hours } from "@/lib/dates";
 export const Route = createFileRoute("/_authenticated/u/$username")({
   head: ({ params }) => ({
     meta: [
-      { title: `@${params.username} — StudySync` },
-      { name: "description", content: "Study profile on StudySync." },
-      { property: "og:title", content: `@${params.username} — StudySync` },
-      { property: "og:description", content: "Study profile on StudySync." },
+      { title: `@${params.username} â€” SkillGrid` },
+      { name: "description", content: "Study profile on SkillGrid." },
+      { property: "og:title", content: `@${params.username} â€” SkillGrid` },
+      { property: "og:description", content: "Study profile on SkillGrid." },
     ],
   }),
   component: ProfilePage,
@@ -57,7 +57,7 @@ function ProfilePage() {
               <h1 className="text-2xl font-semibold">{profile?.full_name || username}</h1>
               <p className="text-sm text-muted-foreground">
                 @{username}
-                {profile?.college && ` · ${profile.college}`}
+                {profile?.college && ` Â· ${profile.college}`}
                 {profile?.graduation_year && ` '${String(profile.graduation_year).slice(2)}`}
               </p>
               {profile?.bio && <p className="mt-1 max-w-xl text-sm">{profile.bio}</p>}

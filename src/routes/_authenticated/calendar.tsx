@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { addMonths, eachDayOfInterval, endOfMonth, format, startOfMonth } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -16,9 +16,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/calendar")({
   head: () => ({
     meta: [
-      { title: "Calendar — StudySync" },
+      { title: "Calendar â€” SkillGrid" },
       { name: "description", content: "Monthly study calendar." },
-      { property: "og:title", content: "Calendar — StudySync" },
+      { property: "og:title", content: "Calendar â€” SkillGrid" },
       { property: "og:description", content: "Monthly study calendar." },
     ],
   }),
@@ -107,8 +107,8 @@ function CalendarPage() {
           </DialogHeader>
           {sel && (
             <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">{Math.round(dayPct(sel))}%</span> ·{" "}
-              {hours(sel.completed)} / {hours(sel.planned)}h completed · {sel.done_tasks}/
+              <span className="font-semibold text-foreground">{Math.round(dayPct(sel))}%</span> Â·{" "}
+              {hours(sel.completed)} / {hours(sel.planned)}h completed Â· {sel.done_tasks}/
               {sel.total_tasks} tasks
             </p>
           )}

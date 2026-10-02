@@ -1,4 +1,4 @@
--- StudySync Complete PostgreSQL Schema & RLS Migrations
+﻿-- SkillGrid Complete PostgreSQL Schema & RLS Migrations
 -- Generated for Supabase Auth & Database Integration
 
 -- ========================================================
@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS public.reactions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   activity_id uuid NOT NULL REFERENCES public.activities(id) ON DELETE CASCADE,
-  reaction text NOT NULL CHECK (reaction IN ('🔥','👏','💪','🎯')),
+  reaction text NOT NULL CHECK (reaction IN ('ðŸ”¥','ðŸ‘','ðŸ’ª','ðŸŽ¯')),
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (user_id, activity_id, reaction)
 );

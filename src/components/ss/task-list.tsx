@@ -21,6 +21,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSubjects, useUser } from "@/hooks/use-session";
 import { dayPct, type Task } from "@/lib/data";
 import { fmtMinutes, todayStr } from "@/lib/dates";
+import {
+  awardDailyGoalComplete,
+  awardTaskCompletion,
+  awardTaskTime100,
+  checkTaskMilestones,
+} from "@/lib/rewards";
 import { cn } from "@/lib/utils";
 import { EmptyState } from "./primitives";
 import { TaskDialog } from "./task-dialog";
@@ -83,7 +89,16 @@ export function TaskList({
         .update({ completed, completed_at: completed ? new Date().toISOString() : null })
         .eq("id", i.id);
       if (error) throw error;
-      return completed;
+
+      let xpResult = null;
+      if (completed && user?.id) {
+        const sName = subjects.find((s) => s.id === i.subject_id)?.name;
+        xpResult = await awardTaskCompletion(user.id, i.id, i.title, sName);
+        await checkTaskMilestones(user.id, i.date);
+        await awardTaskTime100(user.id, i.id, i.title);
+      }
+      
+      return { completed, xpResult };
     },
     onMutate: async (i) => {
       const key = ["instances", user?.id, date];
@@ -120,7 +135,26 @@ export function TaskList({
             { onConflict: "user_id,dedupe_key", ignoreDuplicates: true },
           );
         }
-        const prog = qc.getQueryData<{ streak?: { current: number } }>(["progress", user.id]);
+        if (pct >= 100) {
+          const res = await awardDailyGoalComplete(user.id, date);
+          if (res?.event) toast.success(`Daily goal complete! +${res.event.amount} XP`);
+        }
+        
+        // Use a better type cast to get the week property
+        const prog = qc.getQueryData<any>(["progress", user.id]);
+        
+        if (pct >= 150) {
+           const { checkAndAwardAchievements } = await import("@/lib/rewards");
+           await checkAndAwardAchievements(user.id, "daily_overachiever", 1);
+        }
+
+        if (prog?.week?.pct >= 100) {
+          const { awardWeeklyGoalComplete } = await import("@/lib/rewards");
+          const weekStartStr = prog.weekDays?.[0]?.day || date; 
+          const wRes = await awardWeeklyGoalComplete(user.id, `week-${weekStartStr}`);
+          if (wRes?.event) toast.success(`Weekly goal complete! +${wRes.event.amount} XP`);
+        }
+
         const streak = prog?.streak?.current ?? 0;
         const milestones = [3, 5, 7, 10, 14, 21, 30, 45, 60, 90, 100, 365];
         if (streak >= 3 && milestones.includes(streak)) {
@@ -133,9 +167,33 @@ export function TaskList({
             },
             { onConflict: "user_id,dedupe_key", ignoreDuplicates: true },
           );
+          
+          // XP for specific streak milestones
+          const { awardXP, XP_REWARDS, checkAndAwardAchievements } = await import("@/lib/rewards");
+          let streakXp = 0;
+          if (streak === 3) streakXp = XP_REWARDS.STREAK_3;
+          if (streak === 7) streakXp = XP_REWARDS.STREAK_7;
+          if (streak === 30) streakXp = XP_REWARDS.STREAK_30;
+          
+          if (streakXp > 0) {
+            const sxpRes = await awardXP(user.id, streakXp, `${streak}-day streak`, `streak_${streak}`, String(streak));
+            if (sxpRes?.event) toast.success(`${streak}-day streak! +${streakXp} XP`);
+          }
+          await checkAndAwardAchievements(user.id, "streak_days", streak);
         }
       }
     },
+    onSuccess: (data) => {
+      if (data?.xpResult?.event) {
+        toast.success(`+${data.xpResult.event.amount} XP: ${data.xpResult.event.reason}`);
+      }
+      if (data?.xpResult?.leveledUp) {
+        toast.success(`🎉 LEVEL UP! You reached Level ${data.xpResult.newLevel}`, {
+          duration: 5000,
+          position: "top-center",
+        });
+      }
+    }
   });
 
   async function editTask(i: Instance) {

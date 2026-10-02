@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({
     meta: [
-      { title: "Reset your password — StudySync" },
-      { name: "description", content: "Get a link to reset your StudySync password." },
-      { property: "og:title", content: "Reset your password — StudySync" },
-      { property: "og:description", content: "Get a link to reset your StudySync password." },
+      { title: "Reset your password â€” SkillGrid" },
+      { name: "description", content: "Get a link to reset your SkillGrid password." },
+      { property: "og:title", content: "Reset your password â€” SkillGrid" },
+      { property: "og:description", content: "Get a link to reset your SkillGrid password." },
     ],
   }),
   component: Forgot,
@@ -56,7 +56,7 @@ function Forgot() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-              <Button disabled={loading}>{loading ? "Sending…" : "Send reset link"}</Button>
+              <Button disabled={loading}>{loading ? "Sendingâ€¦" : "Send reset link"}</Button>
             </form>
           )}
           <Link

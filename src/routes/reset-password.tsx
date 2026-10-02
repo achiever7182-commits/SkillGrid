@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Choose a new password — StudySync" },
-      { name: "description", content: "Set a new password for your StudySync account." },
-      { property: "og:title", content: "Choose a new password — StudySync" },
-      { property: "og:description", content: "Set a new password for your StudySync account." },
+      { title: "Choose a new password â€” SkillGrid" },
+      { name: "description", content: "Set a new password for your SkillGrid account." },
+      { property: "og:title", content: "Choose a new password â€” SkillGrid" },
+      { property: "og:description", content: "Set a new password for your SkillGrid account." },
     ],
   }),
   component: Reset,
@@ -35,6 +35,7 @@ function Reset() {
     }
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password: pw });
+    if (!error) await supabase.auth.refreshSession();
     setLoading(false);
     if (error) {
       toast.error(error.message);
@@ -65,7 +66,7 @@ function Reset() {
             onChange={(e) => setConfirm(e.target.value)}
             autoComplete="new-password"
           />
-          <Button disabled={loading}>{loading ? "Saving…" : "Update password"}</Button>
+          <Button disabled={loading}>{loading ? "Savingâ€¦" : "Update password"}</Button>
         </form>
       </div>
     </div>

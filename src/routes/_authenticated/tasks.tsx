@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, PageHeader } from "@/components/ss/app-shell";
 import { Panel } from "@/components/ss/primitives";
 import { TaskList } from "@/components/ss/task-list";
@@ -6,9 +6,9 @@ import { TaskList } from "@/components/ss/task-list";
 export const Route = createFileRoute("/_authenticated/tasks")({
   head: () => ({
     meta: [
-      { title: "Tasks — StudySync" },
+      { title: "Tasks â€” SkillGrid" },
       { name: "description", content: "Manage your study tasks." },
-      { property: "og:title", content: "Tasks — StudySync" },
+      { property: "og:title", content: "Tasks â€” SkillGrid" },
       { property: "og:description", content: "Manage your study tasks." },
     ],
   }),

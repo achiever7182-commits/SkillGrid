@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -14,9 +14,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
     meta: [
-      { title: "Get started — StudySync" },
+      { title: "Get started â€” SkillGrid" },
       { name: "description", content: "Set up your subjects and weekly schedule." },
-      { property: "og:title", content: "Get started — StudySync" },
+      { property: "og:title", content: "Get started â€” SkillGrid" },
       { property: "og:description", content: "Set up your study schedule." },
     ],
   }),
@@ -142,7 +142,7 @@ function Onboarding() {
               <li key={n} className="flex justify-between">
                 <span>{n}</span>
                 <span className="font-mono text-muted-foreground">
-                  {fmtMinutes(d?.minutes ?? 60)} ·{" "}
+                  {fmtMinutes(d?.minutes ?? 60)} Â·{" "}
                   {(d?.days ?? [1, 2, 3, 4, 5]).map((x) => DAY_NAMES[x]).join(" ")}
                 </span>
               </li>
@@ -151,7 +151,7 @@ function Onboarding() {
         </ul>
       </div>
       <Button size="lg" className="mt-8 w-full" onClick={finish} disabled={saving}>
-        {saving ? "Setting up…" : "Start studying"}
+        {saving ? "Setting upâ€¦" : "Start studying"}
       </Button>
     </div>
   );

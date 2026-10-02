@@ -364,6 +364,225 @@ export type Database = {
           },
         ];
       };
+      achievements: {
+        Row: {
+          id: string;
+          name: string;
+          description: string;
+          icon: string;
+          requirement_type: string;
+          requirement_value: number;
+          xp_reward: number;
+        };
+        Insert: {
+          id: string;
+          name: string;
+          description: string;
+          icon: string;
+          requirement_type: string;
+          requirement_value: number;
+          xp_reward?: number;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          description?: string;
+          icon?: string;
+          requirement_type?: string;
+          requirement_value?: number;
+          xp_reward?: number;
+        };
+        Relationships: [];
+      };
+      personal_rewards: {
+        Row: {
+          created_at: string;
+          description: string | null;
+          icon: string;
+          id: string;
+          title: string;
+          updated_at: string;
+          user_id: string;
+          xp_required: number;
+        };
+        Insert: {
+          created_at?: string;
+          description?: string | null;
+          icon?: string;
+          id?: string;
+          title: string;
+          updated_at?: string;
+          user_id: string;
+          xp_required: number;
+        };
+        Update: {
+          created_at?: string;
+          description?: string | null;
+          icon?: string;
+          id?: string;
+          title?: string;
+          updated_at?: string;
+          user_id?: string;
+          xp_required?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "personal_rewards_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      reward_redemptions: {
+        Row: {
+          id: string;
+          redeemed_at: string;
+          reward_id: string;
+          user_id: string;
+        };
+        Insert: {
+          id?: string;
+          redeemed_at?: string;
+          reward_id: string;
+          user_id: string;
+        };
+        Update: {
+          id?: string;
+          redeemed_at?: string;
+          reward_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "reward_redemptions_reward_id_fkey";
+            columns: ["reward_id"];
+            isOneToOne: false;
+            referencedRelation: "personal_rewards";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reward_redemptions_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      user_achievements: {
+        Row: {
+          achievement_id: string;
+          id: string;
+          unlocked_at: string;
+          user_id: string;
+        };
+        Insert: {
+          achievement_id: string;
+          id?: string;
+          unlocked_at?: string;
+          user_id: string;
+        };
+        Update: {
+          achievement_id?: string;
+          id?: string;
+          unlocked_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey";
+            columns: ["achievement_id"];
+            isOneToOne: false;
+            referencedRelation: "achievements";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_achievements_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      user_stats: {
+        Row: {
+          current_level: number;
+          current_streak: number;
+          last_active_date: string | null;
+          longest_streak: number;
+          total_xp: number;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          current_level?: number;
+          current_streak?: number;
+          last_active_date?: string | null;
+          longest_streak?: number;
+          total_xp?: number;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          current_level?: number;
+          current_streak?: number;
+          last_active_date?: string | null;
+          longest_streak?: number;
+          total_xp?: number;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_stats_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      xp_events: {
+        Row: {
+          amount: number;
+          created_at: string;
+          event_type: string;
+          id: string;
+          reason: string;
+          reference_id: string | null;
+          user_id: string;
+        };
+        Insert: {
+          amount: number;
+          created_at?: string;
+          event_type: string;
+          id?: string;
+          reason: string;
+          reference_id?: string | null;
+          user_id: string;
+        };
+        Update: {
+          amount?: number;
+          created_at?: string;
+          event_type?: string;
+          id?: string;
+          reason?: string;
+          reference_id?: string | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "xp_events_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       user_settings: {
         Row: {
           activity_visibility: string;
