@@ -29,15 +29,20 @@ export function TaskDialog({
   open,
   onOpenChange,
   task,
+  instanceDate,
+  instanceId,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   task?: Task | null;
+  instanceDate?: string;
+  instanceId?: string;
 }) {
   const { data: user } = useUser();
   const { data: subjects = [] } = useSubjects();
   const qc = useQueryClient();
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [subjectId, setSubjectId] = useState<string>("none");
   const [newSubject, setNewSubject] = useState("");
   const [minutes, setMinutes] = useState(60);
@@ -46,10 +51,12 @@ export function TaskDialog({
   const [start, setStart] = useState(todayStr());
   const [end, setEnd] = useState("");
   const [saving, setSaving] = useState(false);
+  const [applyToAll, setApplyToAll] = useState(true);
 
   useEffect(() => {
     if (!open) return;
     setTitle(task?.title ?? "");
+    setDescription(task?.description ?? "");
     setSubjectId(task?.subject_id ?? "none");
     setMinutes(task?.planned_minutes ?? 60);
     setDays(task?.days_of_week ?? [1, 2, 3, 4, 5]);
@@ -57,6 +64,7 @@ export function TaskDialog({
     setStart(task?.start_date ?? todayStr());
     setEnd(task?.end_date ?? "");
     setNewSubject("");
+    setApplyToAll(true);
   }, [open, task]);
 
   async function save() {
@@ -96,6 +104,7 @@ export function TaskDialog({
       }
       const payload = {
         title: title.trim(),
+        description: description.trim() || null,
         subject_id: sid,
         planned_minutes: minutes,
         days_of_week: days.sort(),
@@ -105,20 +114,40 @@ export function TaskDialog({
       };
       const today = todayStr();
       if (task) {
-        const { error } = await supabase.from("tasks").update(payload).eq("id", task.id);
-        if (error) throw error;
-        // Refresh today's and future, not-yet-completed instances; past history stays intact.
-        await supabase
-          .from("task_instances")
-          .delete()
-          .eq("task_id", task.id)
-          .gte("date", today)
-          .eq("completed", false);
-        await supabase
-          .from("task_instances")
-          .update({ title: payload.title, subject_id: sid, planned_minutes: minutes })
-          .eq("task_id", task.id)
-          .gte("date", today);
+        if (!applyToAll && instanceId) {
+          // Update only this specific instance
+          const { error } = await supabase
+            .from("task_instances")
+            .update({
+              title: payload.title,
+              description: payload.description,
+              subject_id: sid,
+              planned_minutes: minutes,
+            })
+            .eq("id", instanceId);
+          if (error) throw error;
+        } else {
+          // Apply to all
+          const { error } = await supabase.from("tasks").update(payload).eq("id", task.id);
+          if (error) throw error;
+          // Refresh today's and future, not-yet-completed instances; past history stays intact.
+          await supabase
+            .from("task_instances")
+            .delete()
+            .eq("task_id", task.id)
+            .gte("date", today)
+            .eq("completed", false);
+          await supabase
+            .from("task_instances")
+            .update({ 
+              title: payload.title, 
+              description: payload.description,
+              subject_id: sid, 
+              planned_minutes: minutes 
+            })
+            .eq("task_id", task.id)
+            .gte("date", today);
+        }
       } else {
         const { error } = await supabase.from("tasks").insert({ ...payload, user_id: user.id });
         if (error) throw error;
@@ -151,6 +180,15 @@ export function TaskDialog({
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Binary Tree Practice"
               maxLength={80}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label>Description (optional)</Label>
+            <Input
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="E.g. solve 3 medium problems"
+              maxLength={200}
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -190,16 +228,49 @@ export function TaskDialog({
               maxLength={40}
             />
           )}
-          <div className="flex items-center justify-between">
-            <Label htmlFor="rec">Recurring</Label>
-            <Switch id="rec" checked={recurring} onCheckedChange={setRecurring} />
+          <div className="grid gap-2">
+            <Label>Repeat</Label>
+            <div className="flex bg-muted p-1 rounded-lg">
+              {(["none", "every_day", "custom"] as const).map((mode) => {
+                const isSelected = 
+                  mode === "none" ? !recurring :
+                  mode === "every_day" ? (recurring && days.length === 7) :
+                  (recurring && days.length < 7);
+                  
+                return (
+                  <button
+                    key={mode}
+                    type="button"
+                    disabled={task ? (!applyToAll && instanceId !== undefined) : false}
+                    onClick={() => {
+                      if (mode === "none") {
+                        setRecurring(false);
+                      } else if (mode === "every_day") {
+                        setRecurring(true);
+                        setDays([0, 1, 2, 3, 4, 5, 6]);
+                      } else {
+                        setRecurring(true);
+                      }
+                    }}
+                    className={cn(
+                      "flex-1 text-sm font-medium h-8 rounded-md transition-all",
+                      isSelected ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground",
+                      task && !applyToAll && instanceId !== undefined && "opacity-50 cursor-not-allowed"
+                    )}
+                  >
+                    {mode === "none" ? "None" : mode === "every_day" ? "Every day" : "Custom"}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          {recurring && (
-            <div className="flex flex-wrap gap-1.5">
+          {recurring && days.length < 7 && (
+            <div className="flex flex-wrap gap-1.5 mt-1">
               {[1, 2, 3, 4, 5, 6, 0].map((d) => (
                 <button
                   key={d}
                   type="button"
+                  disabled={task ? (!applyToAll && instanceId !== undefined) : false}
                   onClick={() =>
                     setDays((p) => (p.includes(d) ? p.filter((x) => x !== d) : [...p, d]))
                   }
@@ -208,11 +279,18 @@ export function TaskDialog({
                     days.includes(d)
                       ? "border-primary bg-primary text-primary-foreground"
                       : "hover:bg-muted",
+                    task && !applyToAll && instanceId !== undefined && "opacity-50 cursor-not-allowed"
                   )}
                 >
                   {DAY_NAMES[d]}
                 </button>
               ))}
+            </div>
+          )}
+          {task && instanceId && (
+            <div className="flex items-center space-x-2 mt-1">
+              <Switch id="applyAll" checked={applyToAll} onCheckedChange={setApplyToAll} />
+              <Label htmlFor="applyAll" className="text-sm font-medium">Apply changes to all scheduled days</Label>
             </div>
           )}
           <div className="grid grid-cols-2 gap-3">

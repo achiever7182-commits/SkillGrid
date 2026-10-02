@@ -29,6 +29,7 @@ export type Instance = {
   id: string;
   task_id: string;
   title: string;
+  description: string | null;
   subject_id: string | null;
   date: string;
   planned_minutes: number;
@@ -66,7 +67,7 @@ export function TaskList({
   const { data: items = [], isLoading } = useInstances(date);
   const { data: subjects = [] } = useSubjects();
   const qc = useQueryClient();
-  const [dialog, setDialog] = useState<{ open: boolean; task: Task | null }>({
+  const [dialog, setDialog] = useState<{ open: boolean; task: Task | null; instance?: Instance }>({
     open: false,
     task: null,
   });
@@ -139,7 +140,7 @@ export function TaskList({
 
   async function editTask(i: Instance) {
     const { data } = await supabase.from("tasks").select("*").eq("id", i.task_id).single();
-    if (data) setDialog({ open: true, task: data });
+    if (data) setDialog({ open: true, task: data, instance: i });
   }
   async function removeTask(i: Instance) {
     if (!confirm(`Remove "${i.title}" from your schedule? Past history is kept.`)) return;
@@ -231,6 +232,11 @@ export function TaskList({
                   >
                     {i.title}
                   </div>
+                  {i.description && (
+                    <div className="text-xs text-muted-foreground mt-0.5 mb-0.5 line-clamp-1">
+                      {i.description}
+                    </div>
+                  )}
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     {s && <span>{s.name}</span>}
                     {i.notes && (
@@ -292,6 +298,8 @@ export function TaskList({
       <TaskDialog
         open={dialog.open}
         task={dialog.task}
+        instanceId={dialog.instance?.id}
+        instanceDate={dialog.instance?.date}
         onOpenChange={(o) => setDialog((d) => ({ ...d, open: o }))}
       />
       <Dialog open={!!noteFor} onOpenChange={(o) => !o && setNoteFor(null)}>

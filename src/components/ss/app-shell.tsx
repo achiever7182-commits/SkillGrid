@@ -32,15 +32,15 @@ import { Logo, UserAvatar } from "./primitives";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/planner", label: "Planner", icon: CalendarDays },
   { to: "/tasks", label: "Tasks", icon: ListChecks },
-  { to: "/calendar", label: "Calendar", icon: CalendarDays },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/friends", label: "Friends", icon: Users },
   { to: "/history", label: "History", icon: History },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
 const MOBILE_NAV = NAV.filter((n) =>
-  ["/dashboard", "/tasks", "/calendar", "/analytics", "/friends"].includes(n.to),
+  ["/dashboard", "/planner", "/tasks", "/analytics", "/friends"].includes(n.to),
 );
 
 export function AppShell({ children }: { children: ReactNode }) {

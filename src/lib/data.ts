@@ -29,6 +29,7 @@ export const DEFAULT_SCHEDULE: { subject: string; days: number[]; minutes: numbe
 export type Task = {
   id: string;
   title: string;
+  description: string | null;
   subject_id: string | null;
   planned_minutes: number;
   days_of_week: number[];
@@ -51,7 +52,7 @@ export async function ensureInstances(userId: string, from: string, to?: string)
   if (from > end) return;
   const { data: tasks, error } = await supabase
     .from("tasks")
-    .select("id,title,subject_id,planned_minutes,days_of_week,recurring,start_date,end_date")
+    .select("id,title,description,subject_id,planned_minutes,days_of_week,recurring,start_date,end_date")
     .eq("user_id", userId)
     .eq("archived", false);
   if (error) throw error;
@@ -60,6 +61,7 @@ export async function ensureInstances(userId: string, from: string, to?: string)
     user_id: string;
     subject_id: string | null;
     title: string;
+    description: string | null;
     date: string;
     planned_minutes: number;
   }[] = [];
@@ -76,6 +78,7 @@ export async function ensureInstances(userId: string, from: string, to?: string)
           user_id: userId,
           subject_id: t.subject_id,
           title: t.title,
+          description: t.description,
           date: d,
           planned_minutes: t.planned_minutes,
         });
