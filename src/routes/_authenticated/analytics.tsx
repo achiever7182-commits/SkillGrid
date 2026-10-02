@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { addDays, format } from "date-fns";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppShell, PageHeader } from "@/components/ss/app-shell";
 import { WeeklyBarChart, WeeklyLineChart } from "@/components/ss/charts";
@@ -10,15 +10,15 @@ import { Panel, SectionTitle, StatCard } from "@/components/ss/primitives";
 import { SubjectCards } from "@/components/ss/subject-cards";
 import { useUser } from "@/hooks/use-session";
 import { useProgress } from "@/hooks/use-progress";
-import { pctOf } from "@/lib/data";
-import { hours, toStr, weekStart } from "@/lib/dates";
+import { pctOf, heatLevel, type DayStat } from "@/lib/data";
+import { hours, parse, toStr, weekStart } from "@/lib/dates";
 
 export const Route = createFileRoute("/_authenticated/analytics")({
   head: () => ({
     meta: [
-      { title: "Analytics â€” SkillGrid" },
+      { title: "Analytics — SkillGrid" },
       { name: "description", content: "Weekly and subject study analytics." },
-      { property: "og:title", content: "Analytics â€” SkillGrid" },
+      { property: "og:title", content: "Analytics — SkillGrid" },
       { property: "og:description", content: "Weekly study analytics." },
     ],
   }),
@@ -33,7 +33,7 @@ function Analytics() {
   const currentWs = weekStart();
   const isCurrentWeek = toStr(weekStartSelected) === toStr(currentWs);
   const selectedWeekEnd = addDays(weekStartSelected, 6);
-  const weekLabel = `${format(weekStartSelected, "MMM d")} â€“ ${format(selectedWeekEnd, "MMM d, yyyy")}`;
+  const weekLabel = `${format(weekStartSelected, "MMM d")} – ${format(selectedWeekEnd, "MMM d, yyyy")}`;
 
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const d = toStr(addDays(weekStartSelected, i));
@@ -102,6 +102,11 @@ function Analytics() {
         <StatCard label="Longest" value={`${p?.streak.longest ?? 0}d`} />
       </div>
 
+      <Panel className="mb-8">
+        <SectionTitle index="04">Consistency</SectionTitle>
+        {p && <Heatmap daily={p.daily} streakCurrent={p.streak.current} streakLongest={p.streak.longest} />}
+      </Panel>
+
       <div className="grid gap-6 lg:grid-cols-2 mb-8">
         <Panel>
           <SectionTitle index="01">Daily completion</SectionTitle>
@@ -123,11 +128,7 @@ function Analytics() {
           />
         </Panel>
       </div>
-
-      <Panel className="mb-8">
-        <SectionTitle index="04">Consistency</SectionTitle>
-        {p && <Heatmap daily={p.daily} />}
-      </Panel>
     </AppShell>
   );
 }
+

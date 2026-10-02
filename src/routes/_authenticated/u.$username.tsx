@@ -75,7 +75,7 @@ function ProfilePage() {
                 <StatCard label="Total hours" value={hours(p.totalMinutes)} />
               </div>
               <Panel className="mt-4">
-                <Heatmap daily={p.daily} />
+                <Heatmap daily={p.daily} streakCurrent={p.streak.current} streakLongest={p.streak.longest} />
               </Panel>
               <Panel className="mt-4">
                 <SectionTitle>Subject Progress</SectionTitle>

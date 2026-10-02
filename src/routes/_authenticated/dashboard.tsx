@@ -101,7 +101,7 @@ function Dashboard() {
         </div>
         <div>
           <SectionTitle index="04">Consistency</SectionTitle>
-          {p && <Heatmap daily={p.daily} />}
+          {p && <Heatmap daily={p.daily} streakCurrent={p.streak.current} streakLongest={p.streak.longest} />}
         </div>
       </div>
 
