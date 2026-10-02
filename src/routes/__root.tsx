@@ -8,12 +8,13 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { themeInitScript } from "@/lib/theme";
+import { PostLoginTransition } from "@/components/ui/post-login-transition";
 
 import appCss from "../styles.css?url";
 
@@ -127,6 +128,24 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  const [showLoginTransition, setShowLoginTransition] = useState(() => {
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("skillgrid_show_transition") === "1";
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const handleLoginSuccess = () => {
+      sessionStorage.setItem("skillgrid_show_transition", "1");
+      setShowLoginTransition(true);
+    };
+
+    window.addEventListener("skillgrid:login-success", handleLoginSuccess);
+    return () => {
+      window.removeEventListener("skillgrid:login-success", handleLoginSuccess);
+    };
+  }, []);
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
@@ -144,6 +163,14 @@ function RootComponent() {
         <TooltipProvider delayDuration={100}>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
+          {showLoginTransition && (
+            <PostLoginTransition
+              onComplete={() => {
+                sessionStorage.removeItem("skillgrid_show_transition");
+                setShowLoginTransition(false);
+              }}
+            />
+          )}
           <Toaster richColors position="top-center" />
         </TooltipProvider>
       </AuthProvider>

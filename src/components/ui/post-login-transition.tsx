@@ -11,18 +11,18 @@ export function PostLoginTransition({ onComplete }: PostLoginTransitionProps) {
   const [phase, setPhase] = useState<"enter" | "hold" | "exit">("enter");
 
   useEffect(() => {
-    // Cinematic editorial sequence timing (~2.6s total)
+    // Cinematic editorial sequence timing (~3s total)
     const holdTimer = setTimeout(() => {
       setPhase("hold");
-    }, 1800);
+    }, 2000);
 
     const exitTimer = setTimeout(() => {
       setPhase("exit");
-    }, 2350);
+    }, 2600);
 
     const completeTimer = setTimeout(() => {
       onComplete();
-    }, 2750);
+    }, 3100);
 
     return () => {
       clearTimeout(holdTimer);
@@ -33,10 +33,10 @@ export function PostLoginTransition({ onComplete }: PostLoginTransitionProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
+      initial={{ opacity: 1 }}
       animate={{ opacity: phase === "exit" ? 0 : 1 }}
-      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background px-6 select-none"
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center px-6 select-none"
       style={{
         backgroundColor: "var(--color-background, #F8F4E7)",
         color: "var(--color-foreground, #2B2021)",

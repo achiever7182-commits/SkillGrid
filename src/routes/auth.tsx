@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -9,7 +9,6 @@ import { Logo } from "@/components/ss/primitives";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { RobotMascot } from "@/components/ui/robot-hero";
-import { PostLoginTransition } from "@/components/ui/post-login-transition";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>): { mode?: "signup" } =>
@@ -53,19 +52,15 @@ function AuthPage() {
   const [sent, setSent] = useState(false);
   const [lookState, setLookState] = useState<"idle" | "email" | "password">("idle");
   const [loginSuccess, setLoginSuccess] = useState(false);
-  const [showSuccessTransition, setShowSuccessTransition] = useState(false);
-  const isLoggingInRef = useRef(false);
 
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setF({ ...f, [k]: e.target.value });
 
   useEffect(() => {
-    // Only redirect if user landed on /auth with an existing session.
-    // Never interrupt an active login attempt or the success transition!
-    if (authUser && !isLoggingInRef.current && !showSuccessTransition) {
+    if (authUser) {
       navigate({ to: "/dashboard" });
     }
-  }, [authUser, showSuccessTransition, navigate]);
+  }, [authUser, navigate]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -93,14 +88,12 @@ function AuthPage() {
         }
         else setSent(true);
       } else {
-        isLoggingInRef.current = true;
         const { error } = await signIn({ email: f.email.trim(), password: f.password });
-        if (error) {
-          isLoggingInRef.current = false;
-          throw error;
-        }
+        if (error) throw error;
         setLoginSuccess(true);
-        setShowSuccessTransition(true);
+        sessionStorage.setItem("skillgrid_show_transition", "1");
+        window.dispatchEvent(new CustomEvent("skillgrid:login-success"));
+        navigate({ to: "/dashboard" });
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
@@ -279,14 +272,6 @@ function AuthPage() {
         </div>
       </div>
     </div>
-
-    {showSuccessTransition && (
-      <PostLoginTransition
-        onComplete={() => {
-          navigate({ to: "/dashboard" });
-        }}
-      />
-    )}
   </div>
   );
 }
