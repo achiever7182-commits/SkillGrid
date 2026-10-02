@@ -716,10 +716,10 @@ export function RobotMascot({ lookState, success }: { lookState: 'idle' | 'email
         <ambientLight intensity={1.5} color="#ffffff" />
         <directionalLight position={[0, 6, 3]} intensity={1.2} castShadow />
         <Environment preset="studio" blur={0.5} />
-        <ResponsiveGroup scale={1.8}>
+        <group scale={1.0}>
           <ContactShadows position={[0, -0.7, 0]} opacity={0.6} scale={20} blur={1.5} />
           <RobotPrototype lookState={lookState} success={success} color="#e0e0e0" pantallaColor="#ff3366" />
-        </ResponsiveGroup>
+        </group>
       </Canvas>
     </div>
   );
