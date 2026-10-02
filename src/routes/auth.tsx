@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -54,12 +54,15 @@ function AuthPage() {
   const [lookState, setLookState] = useState<"idle" | "email" | "password">("idle");
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [showSuccessTransition, setShowSuccessTransition] = useState(false);
+  const isLoggingInRef = useRef(false);
 
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setF({ ...f, [k]: e.target.value });
 
   useEffect(() => {
-    if (authUser && !showSuccessTransition) {
+    // Only redirect if user landed on /auth with an existing session.
+    // Never interrupt an active login attempt or the success transition!
+    if (authUser && !isLoggingInRef.current && !showSuccessTransition) {
       navigate({ to: "/dashboard" });
     }
   }, [authUser, showSuccessTransition, navigate]);
@@ -90,8 +93,12 @@ function AuthPage() {
         }
         else setSent(true);
       } else {
+        isLoggingInRef.current = true;
         const { error } = await signIn({ email: f.email.trim(), password: f.password });
-        if (error) throw error;
+        if (error) {
+          isLoggingInRef.current = false;
+          throw error;
+        }
         setLoginSuccess(true);
         setShowSuccessTransition(true);
       }
