@@ -114,16 +114,19 @@ function AuthPage() {
   }
 
   return (
-    <div className="grid min-h-screen place-items-center px-4">
-      <div className="w-full max-w-sm">
+    <div className="relative min-h-screen grid place-items-center px-4 overflow-hidden">
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <RobotMascot lookState={lookState} success={loginSuccess} />
+      </div>
+
+      <div className="w-full max-w-sm z-10 relative">
         <Link to="/" className="mb-8 flex justify-center">
           <Logo />
         </Link>
         <div className="glass rounded-2xl p-6 relative">
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-56 h-40 pointer-events-none z-10 flex flex-col items-center justify-end">
-            <RobotMascot lookState={lookState} success={loginSuccess} />
+          <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-full flex justify-center pointer-events-none z-10">
             <div
-              className={`absolute top-0 whitespace-nowrap rounded-full bg-background/80 backdrop-blur border px-3 py-1 text-xs shadow-sm transition-all duration-300 ${
+              className={`whitespace-nowrap rounded-full bg-background/80 backdrop-blur border px-3 py-1 text-xs shadow-sm transition-all duration-300 ${
                 lookState === "password"
                   ? "translate-y-0 opacity-100"
                   : "translate-y-2 opacity-0"

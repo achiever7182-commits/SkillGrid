@@ -482,14 +482,14 @@ export function RobotPrototype({
     let ty = state.pointer.y;
 
     if (lookState === "password") {
-      tx = 1.2;
+      tx = 1.0;
       ty = 0.5;
     } else if (lookState === "email") {
       tx = 0;
-      ty = -0.5;
+      ty = -0.3;
     }
 
-    const maxMoveX = state.viewport.width / 3.5;
+    const maxMoveX = state.viewport.width / 2.2;
     const targetPosX = tx * maxMoveX;
     bodyRef.current.position.x = THREE.MathUtils.lerp(
       bodyRef.current.position.x,
@@ -705,13 +705,18 @@ export function RobotPrototype({
 
 export function RobotMascot({ lookState, success }: { lookState: 'idle' | 'email' | 'password', success: boolean }) {
   return (
-    <div className="w-full h-32 relative">
-      <Canvas shadows camera={{ position: [0, 0, 4.5], fov: 40 }}>
+    <div className="w-full h-full relative pointer-events-none">
+      <Canvas 
+        shadows 
+        camera={{ position: [0, 1, 9], fov: 40 }}
+        eventSource={typeof window !== "undefined" ? document.body : undefined}
+        eventPrefix="client"
+      >
         <ambientLight intensity={1} color="#ffffff" />
         <directionalLight position={[0, 6, 3]} intensity={1} castShadow />
         <Environment preset="studio" blur={0.5} />
-        <ResponsiveGroup scale={1}>
-          <ContactShadows position={[0, -0.7, 0]} opacity={0.5} scale={5} blur={1} />
+        <ResponsiveGroup scale={3.5}>
+          <ContactShadows position={[0, -0.7, 0]} opacity={0.5} scale={15} blur={1} />
           <RobotPrototype lookState={lookState} success={success} color="#e0e0e0" pantallaColor="#ff3366" />
         </ResponsiveGroup>
       </Canvas>
