@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -85,7 +85,7 @@ function Onboarding() {
       await qc.invalidateQueries();
       navigate({ to: "/dashboard" });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Setup failed");
+      toast.error((e as any)?.message || "Setup failed");
     } finally {
       setSaving(false);
     }
