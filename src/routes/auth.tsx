@@ -9,6 +9,7 @@ import { Logo } from "@/components/ss/primitives";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { RobotMascot } from "@/components/ui/robot-hero";
+import { PostLoginTransition } from "@/components/ui/post-login-transition";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>): { mode?: "signup" } =>
@@ -52,15 +53,16 @@ function AuthPage() {
   const [sent, setSent] = useState(false);
   const [lookState, setLookState] = useState<"idle" | "email" | "password">("idle");
   const [loginSuccess, setLoginSuccess] = useState(false);
+  const [showSuccessTransition, setShowSuccessTransition] = useState(false);
 
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setF({ ...f, [k]: e.target.value });
 
   useEffect(() => {
-    if (authUser) {
+    if (authUser && !showSuccessTransition) {
       navigate({ to: "/dashboard" });
     }
-  }, [authUser, navigate]);
+  }, [authUser, showSuccessTransition, navigate]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -91,7 +93,7 @@ function AuthPage() {
         const { error } = await signIn({ email: f.email.trim(), password: f.password });
         if (error) throw error;
         setLoginSuccess(true);
-        setTimeout(() => navigate({ to: "/dashboard" }), 1000);
+        setShowSuccessTransition(true);
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
@@ -270,6 +272,14 @@ function AuthPage() {
         </div>
       </div>
     </div>
+
+    {showSuccessTransition && (
+      <PostLoginTransition
+        onComplete={() => {
+          navigate({ to: "/dashboard" });
+        }}
+      />
+    )}
   </div>
   );
 }

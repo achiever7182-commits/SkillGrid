@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { motion } from "framer-motion";
 import { Clock, Flame, ListChecks, TrendingUp } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/ss/app-shell";
 import { ActivityFeed } from "@/components/ss/activity-feed";
@@ -36,7 +37,12 @@ function Dashboard() {
   const pct = t ? dayPct(t) : 0;
   return (
     <AppShell>
-      <div className="flex items-start justify-between">
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <div className="flex items-start justify-between">
         <PageHeader
           title={<>{greeting()},<br/><span className="italic text-primary">{profile?.full_name || profile?.username || "Scholar"}</span>.</>}
           subtitle="Let's make today count."
@@ -109,6 +115,7 @@ function Dashboard() {
         <SectionTitle index="05">Social</SectionTitle>
         <ActivityFeed limit={10} />
       </div>
+      </motion.div>
     </AppShell>
   );
 }
