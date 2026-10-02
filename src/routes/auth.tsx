@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/ss/primitives";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { RobotMascot } from "@/components/ui/robot-hero";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>): { mode?: "signup" } =>
@@ -49,6 +50,9 @@ function AuthPage() {
   const [f, setF] = useState({ fullName: "", username: "", email: "", password: "", confirm: "" });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [lookState, setLookState] = useState<"idle" | "email" | "password">("idle");
+  const [loginSuccess, setLoginSuccess] = useState(false);
+
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setF({ ...f, [k]: e.target.value });
 
@@ -78,12 +82,16 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        if (data.session) navigate({ to: "/onboarding" });
+        if (data.session) {
+          setLoginSuccess(true);
+          setTimeout(() => navigate({ to: "/onboarding" }), 1000);
+        }
         else setSent(true);
       } else {
         const { error } = await signIn({ email: f.email.trim(), password: f.password });
         if (error) throw error;
-        navigate({ to: "/dashboard" });
+        setLoginSuccess(true);
+        setTimeout(() => navigate({ to: "/dashboard" }), 1000);
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
@@ -111,7 +119,19 @@ function AuthPage() {
         <Link to="/" className="mb-8 flex justify-center">
           <Logo />
         </Link>
-        <div className="glass rounded-2xl p-6">
+        <div className="glass rounded-2xl p-6 relative">
+          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-56 h-40 pointer-events-none z-10 flex flex-col items-center justify-end">
+            <RobotMascot lookState={lookState} success={loginSuccess} />
+            <div
+              className={`absolute top-0 whitespace-nowrap rounded-full bg-background/80 backdrop-blur border px-3 py-1 text-xs shadow-sm transition-all duration-300 ${
+                lookState === "password"
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-2 opacity-0"
+              }`}
+            >
+              🙈 I'll look away while you type.
+            </div>
+          </div>
           {sent ? (
             <div className="text-center">
               <h1 className="text-xl font-semibold">Check your email</h1>
@@ -132,13 +152,21 @@ function AuthPage() {
                   <>
                     <div className="grid gap-1.5">
                       <Label>Full name</Label>
-                      <Input value={f.fullName} onChange={set("fullName")} autoComplete="name" />
+                      <Input
+                        value={f.fullName}
+                        onChange={set("fullName")}
+                        onFocus={() => setLookState("email")}
+                        onBlur={() => setLookState("idle")}
+                        autoComplete="name"
+                      />
                     </div>
                     <div className="grid gap-1.5">
                       <Label>Username</Label>
                       <Input
                         value={f.username}
                         onChange={set("username")}
+                        onFocus={() => setLookState("email")}
+                        onBlur={() => setLookState("idle")}
                         placeholder="kaif_codes"
                         autoComplete="username"
                       />
@@ -151,6 +179,8 @@ function AuthPage() {
                     type="email"
                     value={f.email}
                     onChange={set("email")}
+                    onFocus={() => setLookState("email")}
+                    onBlur={() => setLookState("idle")}
                     autoComplete="email"
                     required
                   />
@@ -171,6 +201,8 @@ function AuthPage() {
                     type="password"
                     value={f.password}
                     onChange={set("password")}
+                    onFocus={() => setLookState("password")}
+                    onBlur={() => setLookState("idle")}
                     autoComplete={isSignup ? "new-password" : "current-password"}
                     required
                   />
@@ -182,6 +214,8 @@ function AuthPage() {
                       type="password"
                       value={f.confirm}
                       onChange={set("confirm")}
+                      onFocus={() => setLookState("password")}
+                      onBlur={() => setLookState("idle")}
                       autoComplete="new-password"
                     />
                   </div>
