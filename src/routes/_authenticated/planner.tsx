@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/planner")({
   head: () => ({
     meta: [
-      { title: "Weekly Planner — StudySync" },
+      { title: "Weekly Planner — SkillGrid" },
       { name: "description", content: "Plan and view your tasks for the week." },
     ],
   }),

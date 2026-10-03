@@ -20,9 +20,9 @@ export const Route = createFileRoute("/_authenticated/friends")({
     typeof s["tab"] === "string" ? { tab: s["tab"] } : {},
   head: () => ({
     meta: [
-      { title: "Friends â€” SkillGrid" },
+      { title: "Friends — SkillGrid" },
       { name: "description", content: "Your friends' study progress." },
-      { property: "og:title", content: "Friends â€” SkillGrid" },
+      { property: "og:title", content: "Friends — SkillGrid" },
       { property: "og:description", content: "Your friends' study progress." },
     ],
   }),
@@ -47,7 +47,7 @@ function FriendCard({ f }: { f: Basic }) {
             <span className="text-streak">
               <Flame className="inline size-3" /> {p.streak.current} day streak
             </span>{" "}
-            Â· {Math.round(p.week.pct)}% weekly Â· {hours(p.week.completed)}h
+            · {Math.round(p.week.pct)}% weekly · {hours(p.week.completed)}h
           </div>
         ) : (
           <div className="text-xs text-muted-foreground">Progress is private</div>
@@ -111,7 +111,7 @@ function Friends() {
 
   return (
     <AppShell>
-      <PageHeader title="Friends" subtitle="Cheer each other on â€” no rankings." />
+      <PageHeader title="Friends" subtitle="Cheer each other on — no rankings." />
       <Tabs defaultValue={tab ?? "friends"}>
         <TabsList>
           <TabsTrigger value="friends">Friends</TabsTrigger>
@@ -160,7 +160,7 @@ function Friends() {
               <Panel key={f.id} className="flex items-center gap-3 p-3">
                 <UserAvatar url={p?.avatar_url} name={p?.full_name} />
                 <div className="flex-1">
-                  {p?.full_name} <span className="text-muted-foreground">Â· pending</span>
+                  {p?.full_name} <span className="text-muted-foreground">· pending</span>
                 </div>
                 <Button size="sm" variant="ghost" onClick={() => respond(f.id, false)}>
                   Cancel

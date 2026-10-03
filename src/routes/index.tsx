@@ -8,13 +8,13 @@ import AirlockHero from "@/components/ui/airlock-spaceship-hero";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SkillGrid â€” Track study progress with your friends" },
+      { title: "SkillGrid — Track study progress with your friends" },
       {
         name: "description",
         content:
           "Daily study checklists, streaks, heatmaps and shared progress for students and their friends.",
       },
-      { property: "og:title", content: "SkillGrid â€” Track study progress with your friends" },
+      { property: "og:title", content: "SkillGrid — Track study progress with your friends" },
       {
         property: "og:description",
         content:
@@ -63,7 +63,7 @@ function Landing() {
           <span className="text-muted-foreground">See it add up.</span>
         </h1>
         <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-          Plan your week, check off today's tasks, keep your streak alive â€” and see how your friends
+          Plan your week, check off today's tasks, keep your streak alive — and see how your friends
           are doing, without leaderboards.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">

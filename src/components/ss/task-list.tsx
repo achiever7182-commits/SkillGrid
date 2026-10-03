@@ -286,9 +286,9 @@ export function TaskList({
                   >
                     {i.title}
                   </div>
-                  {i.description && (
+                  {(i.description || i.notes) && (
                     <div className="text-sm text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
-                      {i.description}
+                      {i.description || i.notes}
                     </div>
                   )}
                   <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground mt-3">
@@ -298,7 +298,7 @@ export function TaskList({
                         {s.name}
                       </span>
                     )}
-                    {i.notes && (
+                    {i.notes && i.description && (
                       <span className="inline-flex items-center gap-1 text-primary/80">
                         <NotebookPen className="size-3" strokeWidth={2} />
                         Note

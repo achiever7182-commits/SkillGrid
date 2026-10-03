@@ -16,9 +16,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/calendar")({
   head: () => ({
     meta: [
-      { title: "Calendar â€” SkillGrid" },
+      { title: "Calendar — SkillGrid" },
       { name: "description", content: "Monthly study calendar." },
-      { property: "og:title", content: "Calendar â€” SkillGrid" },
+      { property: "og:title", content: "Calendar — SkillGrid" },
       { property: "og:description", content: "Monthly study calendar." },
     ],
   }),
@@ -113,8 +113,8 @@ function CalendarPage() {
           </DialogHeader>
           {sel && (
             <p className="text-sm text-muted-foreground uppercase tracking-widest font-mono text-[11px] font-bold flex items-center gap-2">
-              <span className="text-primary text-sm">{Math.round(dayPct(sel))}%</span> <span className="opacity-50">Â·</span>{" "}
-              {hours(sel.completed)} / {hours(sel.planned)}h completed <span className="opacity-50">Â·</span> {sel.done_tasks}/
+              <span className="text-primary text-sm">{Math.round(dayPct(sel))}%</span> <span className="opacity-50">·</span>{" "}
+              {hours(sel.completed)} / {hours(sel.planned)}h completed <span className="opacity-50">·</span> {sel.done_tasks}/
               {sel.total_tasks} tasks
             </p>
           )}

@@ -15,13 +15,13 @@ export const Route = createFileRoute("/auth")({
     s["mode"] === "signup" ? { mode: "signup" } : {},
   head: () => ({
     meta: [
-      { title: "Log in or sign up â€” SkillGrid" },
+      { title: "Log in or sign up — SkillGrid" },
       {
         name: "description",
         content:
           "Log in to SkillGrid or create a free account to start tracking your study progress.",
       },
-      { property: "og:title", content: "Log in or sign up â€” SkillGrid" },
+      { property: "og:title", content: "Log in or sign up — SkillGrid" },
       { property: "og:description", content: "Log in to SkillGrid or create a free account." },
     ],
   }),
@@ -35,7 +35,7 @@ const signupSchema = z
       .string()
       .trim()
       .toLowerCase()
-      .regex(/^[a-z0-9_]{3,24}$/, "Username: 3â€“24 letters, numbers or _"),
+      .regex(/^[a-z0-9_]{3,24}$/, "Username: 3–24 letters, numbers or _"),
     email: z.string().trim().email("Enter a valid email").max(255),
     password: z.string().min(8, "Password must be at least 8 characters").max(72),
     confirm: z.string(),
@@ -101,7 +101,7 @@ function AuthPage() {
         msg.toLowerCase().includes("signups not allowed")
       ) {
         toast.error(
-          "Email signups are disabled in your Supabase project. Enable 'Allow new users to sign up' in Supabase Dashboard â†’ Authentication â†’ Providers â†’ Email.",
+          "Email signups are disabled in your Supabase project. Enable 'Allow new users to sign up' in Supabase Dashboard → Authentication → Providers → Email.",
           {
             duration: 8000,
           },
@@ -253,7 +253,7 @@ function AuthPage() {
                     </div>
                   )}
                   <Button type="submit" className="mt-4 rounded-md shadow-none hover:-translate-y-[1px] transition-transform duration-300" disabled={loading}>
-                    {loading ? "Please waitâ€¦" : isSignup ? "Create account" : "Log in"}
+                    {loading ? "Please wait…" : isSignup ? "Create account" : "Log in"}
                   </Button>
                 </form>
                 <p className="mt-8 text-center text-sm text-muted-foreground">

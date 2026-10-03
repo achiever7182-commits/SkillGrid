@@ -13,9 +13,9 @@ import { hours } from "@/lib/dates";
 export const Route = createFileRoute("/_authenticated/u/$username")({
   head: ({ params }) => ({
     meta: [
-      { title: `@${params.username} â€” SkillGrid` },
+      { title: `@${params.username} — SkillGrid` },
       { name: "description", content: "Study profile on SkillGrid." },
-      { property: "og:title", content: `@${params.username} â€” SkillGrid` },
+      { property: "og:title", content: `@${params.username} — SkillGrid` },
       { property: "og:description", content: "Study profile on SkillGrid." },
     ],
   }),
@@ -58,7 +58,7 @@ function ProfilePage() {
               <h1 className="text-2xl font-semibold">{profile?.full_name || username}</h1>
               <p className="text-sm text-muted-foreground">
                 @{username}
-                {profile?.college && ` Â· ${profile.college}`}
+                {profile?.college && ` · ${profile.college}`}
                 {profile?.graduation_year && ` '${String(profile.graduation_year).slice(2)}`}
               </p>
               {profile?.bio && <p className="mt-1 max-w-xl text-sm">{profile.bio}</p>}

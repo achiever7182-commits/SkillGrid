@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -18,9 +18,9 @@ import { daysAgo, fmtMinutes, parse, todayStr } from "@/lib/dates";
 export const Route = createFileRoute("/_authenticated/history")({
   head: () => ({
     meta: [
-      { title: "Task history â€” SkillGrid" },
+      { title: "Task history — SkillGrid" },
       { name: "description", content: "Your past study tasks." },
-      { property: "og:title", content: "Task history â€” SkillGrid" },
+      { property: "og:title", content: "Task history — SkillGrid" },
       { property: "og:description", content: "Your past study tasks." },
     ],
   }),
@@ -102,13 +102,13 @@ function History() {
               <li key={r.id} className="flex items-center justify-between gap-3 py-2.5 text-sm">
                 <div>
                   <div className={r.completed ? "" : "text-muted-foreground"}>
-                    {r.completed ? "âœ“ " : "â—‹ "}
+                    {r.completed ? "✓ " : "○ "}
                     {r.title}
                   </div>
                   {r.notes && <div className="text-xs text-muted-foreground">{r.notes}</div>}
                 </div>
                 <div className="text-right font-mono text-xs text-muted-foreground">
-                  {format(parse(r.date), "MMM d")} Â· {fmtMinutes(r.planned_minutes)}
+                  {format(parse(r.date), "MMM d")} · {fmtMinutes(r.planned_minutes)}
                 </div>
               </li>
             ))}

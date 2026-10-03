@@ -116,20 +116,34 @@ export function TaskDialog({
       if (task) {
         if (!applyToAll && instanceId) {
           // Update only this specific instance
-          const { error } = await supabase
+          const updateFields: Record<string, any> = {
+            title: payload.title,
+            description: payload.description,
+            subject_id: sid,
+            planned_minutes: minutes,
+          };
+          let { error } = await supabase
             .from("task_instances")
-            .update({
-              title: payload.title,
-              description: payload.description,
-              subject_id: sid,
-              planned_minutes: minutes,
-            })
+            .update(updateFields)
             .eq("id", instanceId);
+
+          if (error && (error.message?.includes("description") || error.code === "PGRST204" || String((error as any)?.details || "").includes("description"))) {
+            const { description: _, ...fallbackFields } = updateFields;
+            if (payload.description) fallbackFields.notes = payload.description;
+            const res = await supabase.from("task_instances").update(fallbackFields).eq("id", instanceId);
+            error = res.error;
+          }
           if (error) throw error;
         } else {
           // Apply to all
-          const { error } = await supabase.from("tasks").update(payload).eq("id", task.id);
+          let { error } = await supabase.from("tasks").update(payload).eq("id", task.id);
+          if (error && (error.message?.includes("description") || error.code === "PGRST204" || String((error as any)?.details || "").includes("description"))) {
+            const { description: _, ...withoutDesc } = payload;
+            const res = await supabase.from("tasks").update(withoutDesc).eq("id", task.id);
+            error = res.error;
+          }
           if (error) throw error;
+
           // Refresh today's and future, not-yet-completed instances; past history stays intact.
           await supabase
             .from("task_instances")
@@ -137,19 +151,36 @@ export function TaskDialog({
             .eq("task_id", task.id)
             .gte("date", today)
             .eq("completed", false);
-          await supabase
+
+          const instUpdate: Record<string, any> = { 
+            title: payload.title, 
+            description: payload.description,
+            subject_id: sid, 
+            planned_minutes: minutes 
+          };
+          let { error: instErr } = await supabase
             .from("task_instances")
-            .update({ 
-              title: payload.title, 
-              description: payload.description,
-              subject_id: sid, 
-              planned_minutes: minutes 
-            })
+            .update(instUpdate)
             .eq("task_id", task.id)
             .gte("date", today);
+
+          if (instErr && (instErr.message?.includes("description") || instErr.code === "PGRST204" || String((instErr as any)?.details || "").includes("description"))) {
+            const { description: _, ...fallbackInst } = instUpdate;
+            if (payload.description) fallbackInst.notes = payload.description;
+            await supabase
+              .from("task_instances")
+              .update(fallbackInst)
+              .eq("task_id", task.id)
+              .gte("date", today);
+          }
         }
       } else {
-        const { error } = await supabase.from("tasks").insert({ ...payload, user_id: user.id });
+        let { error } = await supabase.from("tasks").insert({ ...payload, user_id: user.id });
+        if (error && (error.message?.includes("description") || error.code === "PGRST204" || String((error as any)?.details || "").includes("description"))) {
+          const { description: _, ...withoutDesc } = payload;
+          const res = await supabase.from("tasks").insert({ ...withoutDesc, user_id: user.id });
+          error = res.error;
+        }
         if (error) throw error;
       }
       await ensureInstances(

@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { Bell } from "lucide-react";
@@ -12,9 +12,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/notifications")({
   head: () => ({
     meta: [
-      { title: "Notifications â€” SkillGrid" },
+      { title: "Notifications — SkillGrid" },
       { name: "description", content: "Your notifications." },
-      { property: "og:title", content: "Notifications â€” SkillGrid" },
+      { property: "og:title", content: "Notifications — SkillGrid" },
       { property: "og:description", content: "Your notifications." },
     ],
   }),

@@ -24,15 +24,23 @@ function PersonalRewards() {
     queryKey: ["personal_rewards", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("personal_rewards")
-        .select(`
-          *,
-          reward_redemptions ( id )
-        `)
-        .eq("user_id", user!.id)
-        .order("xp_required", { ascending: true });
-      return data || [];
+      try {
+        const { data, error } = await supabase
+          .from("personal_rewards")
+          .select(`
+            *,
+            reward_redemptions ( id )
+          `)
+          .eq("user_id", user!.id)
+          .order("xp_required", { ascending: true });
+        if (error) {
+          console.warn("personal_rewards query notice:", error.message);
+          return [];
+        }
+        return data || [];
+      } catch {
+        return [];
+      }
     }
   });
 
@@ -168,15 +176,23 @@ function RewardsPage() {
     queryKey: ["achievements", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const [allAch, userAch] = await Promise.all([
-        supabase.from("achievements").select("*"),
-        supabase.from("user_achievements").select("achievement_id").eq("user_id", user!.id)
-      ]);
-      const unlockedIds = new Set(userAch.data?.map(a => a.achievement_id) || []);
-      return (allAch.data || []).map(a => ({
-        ...a,
-        unlocked: unlockedIds.has(a.id)
-      }));
+      try {
+        const [allAch, userAch] = await Promise.all([
+          supabase.from("achievements").select("*"),
+          supabase.from("user_achievements").select("achievement_id").eq("user_id", user!.id)
+        ]);
+        if (allAch.error) {
+          console.warn("achievements query notice:", allAch.error.message);
+          return [];
+        }
+        const unlockedIds = new Set(userAch.data?.map(a => a.achievement_id) || []);
+        return (allAch.data || []).map(a => ({
+          ...a,
+          unlocked: unlockedIds.has(a.id)
+        }));
+      } catch {
+        return [];
+      }
     }
   });
 
@@ -184,13 +200,21 @@ function RewardsPage() {
     queryKey: ["xp_history", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("xp_events")
-        .select("*")
-        .eq("user_id", user!.id)
-        .order("created_at", { ascending: false })
-        .limit(20);
-      return data || [];
+      try {
+        const { data, error } = await supabase
+          .from("xp_events")
+          .select("*")
+          .eq("user_id", user!.id)
+          .order("created_at", { ascending: false })
+          .limit(20);
+        if (error) {
+          console.warn("xp_events query notice:", error.message);
+          return [];
+        }
+        return data || [];
+      } catch {
+        return [];
+      }
     }
   });
 

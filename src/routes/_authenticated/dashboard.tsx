@@ -20,9 +20,9 @@ import { Star, Trophy } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard â€” SkillGrid" },
+      { title: "Dashboard — SkillGrid" },
       { name: "description", content: "Today's study progress." },
-      { property: "og:title", content: "Dashboard â€” SkillGrid" },
+      { property: "og:title", content: "Dashboard — SkillGrid" },
       { property: "og:description", content: "Today's study progress." },
     ],
   }),

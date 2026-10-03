@@ -25,9 +25,9 @@ import { applyTheme, getTheme, type ThemeMode } from "@/lib/theme";
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
-      { title: "Settings â€” SkillGrid" },
+      { title: "Settings — SkillGrid" },
       { name: "description", content: "Account, privacy and appearance." },
-      { property: "og:title", content: "Settings â€” SkillGrid" },
+      { property: "og:title", content: "Settings — SkillGrid" },
       { property: "og:description", content: "Account settings." },
     ],
   }),
@@ -157,7 +157,7 @@ function SettingsPage() {
 
   async function saveProfile() {
     if (!/^[a-z0-9_]{3,24}$/.test(pf.username)) {
-      toast.error("Username: 3â€“24 lowercase letters, numbers or _");
+      toast.error("Username: 3–24 lowercase letters, numbers or _");
       return;
     }
     const { error } = await supabase

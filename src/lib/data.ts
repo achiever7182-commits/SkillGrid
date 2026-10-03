@@ -85,10 +85,26 @@ export async function ensureInstances(userId: string, from: string, to?: string)
     }
   }
   for (let i = 0; i < rows.length; i += 500) {
+    const batch = rows.slice(i, i + 500);
     const { error: e } = await supabase
       .from("task_instances")
-      .upsert(rows.slice(i, i + 500), { onConflict: "task_id,date", ignoreDuplicates: true });
-    if (e) throw e;
+      .upsert(batch, { onConflict: "task_id,date", ignoreDuplicates: true });
+    if (e) {
+      // Fallback if description column has not been added to task_instances schema yet
+      if (
+        e.message?.includes("description") ||
+        e.code === "PGRST204" ||
+        String((e as any)?.details || "").includes("description")
+      ) {
+        const fallbackBatch = batch.map(({ description, ...rest }) => rest);
+        const { error: fallbackError } = await supabase
+          .from("task_instances")
+          .upsert(fallbackBatch, { onConflict: "task_id,date", ignoreDuplicates: true });
+        if (fallbackError) throw fallbackError;
+      } else {
+        throw e;
+      }
+    }
   }
 }
 

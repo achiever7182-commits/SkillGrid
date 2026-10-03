@@ -31,36 +31,48 @@ function MessagesPage() {
     queryKey: ["messages-data", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      // Fetch friends
-      const { data: fs } = await supabase.from("friendships").select("*").eq("status", "accepted");
-      
-      // Fetch chat requests
-      const { data: reqs } = await supabase.from("chat_requests").select("*");
-      
-      // Fetch rooms I am part of
-      const { data: myRooms } = await supabase.from("chat_room_members").select("room_id, user_id, last_read_at, room:chat_rooms(updated_at)");
-      
-      // Find IDs to fetch profiles
-      const ids = new Set<string>();
-      (fs ?? []).forEach(f => { ids.add(f.requester_id); ids.add(f.receiver_id); });
-      (reqs ?? []).forEach(r => { ids.add(r.sender_id); ids.add(r.receiver_id); });
-      
-      // We also need profiles for members of my rooms (other users)
-      const myRoomIds = [...new Set((myRooms ?? []).filter(m => m.user_id === user!.id).map(m => m.room_id))];
-      const otherMembers = (myRooms ?? []).filter(m => m.user_id !== user!.id && myRoomIds.includes(m.room_id));
-      otherMembers.forEach(m => ids.add(m.user_id));
+      try {
+        // Fetch friends
+        const { data: fs } = await supabase.from("friendships").select("*").eq("status", "accepted");
+        
+        // Fetch chat requests
+        const { data: reqs } = await supabase.from("chat_requests").select("*");
+        
+        // Fetch rooms I am part of
+        const { data: myRooms } = await supabase.from("chat_room_members").select("room_id, user_id, last_read_at, room:chat_rooms(updated_at)");
+        
+        // Find IDs to fetch profiles
+        const ids = new Set<string>();
+        (fs ?? []).forEach(f => { ids.add(f.requester_id); ids.add(f.receiver_id); });
+        (reqs ?? []).forEach(r => { ids.add(r.sender_id); ids.add(r.receiver_id); });
+        
+        // We also need profiles for members of my rooms (other users)
+        const myRoomIds = [...new Set((myRooms ?? []).filter(m => m.user_id === user!.id).map(m => m.room_id))];
+        const otherMembers = (myRooms ?? []).filter(m => m.user_id !== user!.id && myRoomIds.includes(m.room_id));
+        otherMembers.forEach(m => ids.add(m.user_id));
 
-      const { data: people } = await supabase.rpc("basic_profiles", { _ids: [...ids] });
-      const get = (id: string) => people?.find((p) => p.id === id) as BasicProfile | undefined;
+        const { data: people } = await supabase.rpc("basic_profiles", { _ids: [...ids] });
+        const get = (id: string) => people?.find((p) => p.id === id) as BasicProfile | undefined;
 
-      return {
-        fs: fs ?? [],
-        reqs: reqs ?? [],
-        myRooms: myRooms ?? [],
-        myRoomIds,
-        otherMembers,
-        get
-      };
+        return {
+          fs: fs ?? [],
+          reqs: reqs ?? [],
+          myRooms: myRooms ?? [],
+          myRoomIds,
+          otherMembers,
+          get
+        };
+      } catch (err) {
+        console.warn("Messages query fallback:", err);
+        return {
+          fs: [],
+          reqs: [],
+          myRooms: [],
+          myRoomIds: [],
+          otherMembers: [],
+          get: () => undefined
+        };
+      }
     },
   });
 
