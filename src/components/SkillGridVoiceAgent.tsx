@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Mic, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -13,48 +13,52 @@ export function openSkillGridVoiceAssistant() {
   if (typeof document === "undefined") return;
   const widget = document.querySelector("elevenlabs-convai");
   if (widget) {
-    // Try to trigger internal shadow DOM button first
-    const shadowRoot = (widget as HTMLElement & { shadowRoot?: ShadowRoot }).shadowRoot;
-    const innerButton = shadowRoot?.querySelector("button");
-    if (innerButton) {
-      innerButton.click();
-      return;
+    try {
+      const shadowRoot = (widget as HTMLElement & { shadowRoot?: ShadowRoot }).shadowRoot;
+      const innerButton = shadowRoot?.querySelector("button");
+      if (innerButton) {
+        innerButton.click();
+        return;
+      }
+      const button = widget.querySelector("button") || (widget as HTMLElement);
+      button.click();
+    } catch (e) {
+      console.error("Failed to trigger voice assistant:", e);
     }
-    const button = widget.querySelector("button") || (widget as HTMLElement);
-    button.click();
   }
 }
 
 /**
  * SkillGrid Voice AI Assistant Widget wrapper
- * Embeds the official ElevenLabs ConvAI web component and script
+ * Attaches the official ElevenLabs ConvAI web component to document.body safely on client
  */
 export function SkillGridVoiceAgent({ agentId = ELEVENLABS_AGENT_ID }: { agentId?: string }) {
-  const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
-    setMounted(true);
+    if (typeof document === "undefined") return;
 
-    // Ensure the ElevenLabs widget script is injected into document body if not already present
-    const SCRIPT_SRC = "https://elevenlabs.io/convai-widget/index.js";
-    const existingScript = document.querySelector(`script[src="${SCRIPT_SRC}"]`);
+    try {
+      // 1. Ensure the script is loaded
+      const SCRIPT_SRC = "https://elevenlabs.io/convai-widget/index.js";
+      if (!document.querySelector(`script[src="${SCRIPT_SRC}"]`)) {
+        const script = document.createElement("script");
+        script.src = SCRIPT_SRC;
+        script.async = true;
+        script.type = "text/javascript";
+        document.body.appendChild(script);
+      }
 
-    if (!existingScript) {
-      const script = document.createElement("script");
-      script.src = SCRIPT_SRC;
-      script.async = true;
-      script.type = "text/javascript";
-      document.body.appendChild(script);
+      // 2. Ensure the custom element is in the DOM
+      if (!document.querySelector("elevenlabs-convai")) {
+        const convai = document.createElement("elevenlabs-convai");
+        convai.setAttribute("agent-id", agentId);
+        document.body.appendChild(convai);
+      }
+    } catch (err) {
+      console.warn("SkillGrid voice agent initialization warning:", err);
     }
-  }, []);
+  }, [agentId]);
 
-  if (!mounted) return null;
-
-  return (
-    <div id="skillgrid-voice-agent-container" aria-label="SkillGrid Voice AI Assistant">
-      <elevenlabs-convai agent-id={agentId} />
-    </div>
-  );
+  return null;
 }
 
 /**

@@ -55,6 +55,11 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
         <p className="mt-2 text-sm text-muted-foreground">
           Something went wrong on our end. You can try refreshing or head back home.
         </p>
+        {error && (
+          <div className="mt-4 p-3 rounded bg-destructive/10 text-destructive text-xs font-mono text-left overflow-auto max-h-40 border border-destructive/20">
+            {error instanceof Error ? error.message : String(error)}
+          </div>
+        )}
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
@@ -82,7 +87,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SkillGrid â€” Study together, grow daily" },
+      { title: "SkillGrid — Study together, grow daily" },
       {
         name: "description",
         content: "Track daily study tasks, streaks and progress with friends.",
@@ -103,13 +108,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap",
-      },
-    ],
-    scripts: [
-      {
-        src: "https://elevenlabs.io/convai-widget/index.js",
-        async: true,
-        type: "text/javascript",
       },
     ],
   }),
