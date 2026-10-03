@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Upload, X } from "lucide-react";
+import { Upload, X, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -445,7 +445,7 @@ function SettingsPage() {
           </Panel>
 
           <Panel className="grid gap-4">
-            <SectionTitle index="06">Account</SectionTitle>
+            <SectionTitle index="07">Account</SectionTitle>
             <p className="text-sm font-mono text-muted-foreground">{user?.email}</p>
             <div className="grid gap-2 mt-2">
               <Input
@@ -465,6 +465,21 @@ function SettingsPage() {
             </div>
             <Button variant="outline" onClick={changePassword} className="mt-2 rounded-md border-border/60 text-muted-foreground">
               Change password
+            </Button>
+          </Panel>
+
+          <Panel className="grid gap-4">
+            <SectionTitle index="08">Admin</SectionTitle>
+            <p className="text-sm text-muted-foreground">
+              Access the admin control panel to view member statistics and platform activity.
+            </p>
+            <Button
+              variant="outline"
+              className="rounded-md border-primary/30 text-primary hover:bg-primary/10 hover:text-primary flex items-center gap-2 w-fit"
+              onClick={() => window.open("/admin", "_blank")}
+            >
+              <ShieldCheck className="size-4" strokeWidth={1.5} />
+              Open Admin Panel
             </Button>
           </Panel>
         </div>
