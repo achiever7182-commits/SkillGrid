@@ -76,14 +76,23 @@ export async function awardXP(userId: string, amount: number, reason: string, ev
   }
 
   // Update user total_xp
-  const { data: userStats, error: statsError } = await supabase
+  let { data: userStats, error: statsError } = await supabase
     .from("user_stats")
     .select("total_xp, current_level")
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
 
-  if (statsError) {
-    console.error("Error fetching user stats:", statsError);
+  if (!userStats) {
+    const { data: createdStats } = await supabase
+      .from("user_stats")
+      .insert({ user_id: userId, total_xp: 0, current_level: 1 })
+      .select("total_xp, current_level")
+      .maybeSingle();
+    userStats = createdStats;
+  }
+
+  if (!userStats) {
+    console.error("Error fetching or initializing user stats:", statsError);
     return null;
   }
 
