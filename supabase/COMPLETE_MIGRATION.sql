@@ -256,3 +256,31 @@ END $$;
 
 -- 4. Reload PostgREST Schema Cache
 NOTIFY pgrst, 'reload schema';
+
+-- 5. Admin Controls (Block/Unblock/Delete)
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS blocked boolean NOT NULL DEFAULT false;
+
+CREATE OR REPLACE FUNCTION public.admin_block_user(_user_id uuid)
+RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  UPDATE public.profiles SET blocked = true WHERE id = _user_id;
+END;
+$$;
+GRANT EXECUTE ON FUNCTION public.admin_block_user(uuid) TO anon, authenticated;
+
+CREATE OR REPLACE FUNCTION public.admin_unblock_user(_user_id uuid)
+RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  UPDATE public.profiles SET blocked = false WHERE id = _user_id;
+END;
+$$;
+GRANT EXECUTE ON FUNCTION public.admin_unblock_user(uuid) TO anon, authenticated;
+
+CREATE OR REPLACE FUNCTION public.admin_delete_user(_user_id uuid)
+RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  DELETE FROM public.profiles WHERE id = _user_id;
+  DELETE FROM auth.users WHERE id = _user_id;
+END;
+$$;
+GRANT EXECUTE ON FUNCTION public.admin_delete_user(uuid) TO anon, authenticated;

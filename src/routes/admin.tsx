@@ -14,7 +14,11 @@ import {
   Search,
   Calendar,
   Clock,
+  Ban,
+  Trash2,
 } from "lucide-react";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin")({
@@ -159,6 +163,7 @@ function AdminLogin({ onLogin }: { onLogin: () => void }) {
 /* ─── Dashboard ──────────────────────────────────────────────────────── */
 function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [search, setSearch] = useState("");
+  const queryClient = useQueryClient();
 
   const { data: members, isLoading } = useQuery({
     queryKey: ["admin-members"],
@@ -167,13 +172,36 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       const { data, error } = await supabase
         .from("profiles")
         .select(
-          "id, username, full_name, college, graduation_year, created_at, onboarded, avatar_url, bio",
+          "id, username, full_name, college, graduation_year, created_at, onboarded, avatar_url, bio, blocked",
         )
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
   });
+
+  const handleBlockToggle = async (userId: string, currentlyBlocked: boolean) => {
+    const loadingId = toast.loading(currentlyBlocked ? "Unblocking user..." : "Blocking user...");
+    const { error } = await supabase.rpc(currentlyBlocked ? "admin_unblock_user" : "admin_block_user", { _user_id: userId });
+    if (error) {
+      toast.error(error.message, { id: loadingId });
+    } else {
+      toast.success(currentlyBlocked ? "User unblocked" : "User blocked", { id: loadingId });
+      queryClient.invalidateQueries({ queryKey: ["admin-members"] });
+    }
+  };
+
+  const handleDelete = async (userId: string, name: string) => {
+    if (!window.confirm(`Are you sure you want to PERMANENTLY delete ${name}? This cannot be undone.`)) return;
+    const loadingId = toast.loading("Deleting user...");
+    const { error } = await supabase.rpc("admin_delete_user", { _user_id: userId });
+    if (error) {
+      toast.error(error.message, { id: loadingId });
+    } else {
+      toast.success("User deleted successfully", { id: loadingId });
+      queryClient.invalidateQueries({ queryKey: ["admin-members"] });
+    }
+  };
 
   const { data: activityData } = useQuery({
     queryKey: ["admin-activity"],
@@ -348,6 +376,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                     <th className="text-center px-4 py-3">Onboarded</th>
                     <th className="text-center px-4 py-3">Active (7d)</th>
                     <th className="text-center px-4 py-3 hidden lg:table-cell">Tasks (7d)</th>
+                    <th className="text-right px-5 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/40">
@@ -363,7 +392,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                     });
 
                     return (
-                      <tr key={m.id} className="hover:bg-secondary/20 transition-colors">
+                      <tr key={m.id} className={`transition-colors ${m.blocked ? "bg-red-500/5 hover:bg-red-500/10" : "hover:bg-secondary/20"}`}>
                         {/* Member info */}
                         <td className="px-5 py-3.5">
                           <div className="flex items-center gap-3">
@@ -382,9 +411,12 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                               <div className="font-medium text-foreground truncate max-w-[160px]">
                                 {m.full_name || m.username}
                               </div>
-                              <div className="text-xs text-muted-foreground font-mono">
-                                @{m.username}
-                              </div>
+                                <div className="text-xs text-muted-foreground font-mono flex items-center gap-2">
+                                  @{m.username}
+                                  {m.blocked && (
+                                    <span className="text-[9px] uppercase tracking-wider font-bold text-red-500 bg-red-500/10 px-1.5 rounded-sm">Blocked</span>
+                                  )}
+                                </div>
                             </div>
                           </div>
                         </td>
@@ -456,6 +488,30 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                           ) : (
                             <span className="text-muted-foreground/40 text-xs">—</span>
                           )}
+                        </td>
+
+                        {/* Actions */}
+                        <td className="px-5 py-3.5 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleBlockToggle(m.id, m.blocked)}
+                              className={`p-1.5 rounded-md transition-colors ${
+                                m.blocked 
+                                  ? "text-red-500 bg-red-500/10 hover:bg-red-500/20" 
+                                  : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                              }`}
+                              title={m.blocked ? "Unblock User" : "Block User"}
+                            >
+                              <Ban className="size-4" strokeWidth={m.blocked ? 2 : 1.5} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(m.id, m.full_name || m.username)}
+                              className="p-1.5 rounded-md text-muted-foreground hover:bg-red-500/10 hover:text-red-500 transition-colors"
+                              title="Delete User"
+                            >
+                              <Trash2 className="size-4" strokeWidth={1.5} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
