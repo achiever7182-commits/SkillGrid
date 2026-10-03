@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export const ELEVENLABS_AGENT_ID =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_ELEVENLABS_AGENT_ID) ||
-  "agent_1601m40ryfg9fjcr5rv41je74nk4";
+  "agent_5501m40z5eyve89a9pjn0c1k81m1";
 
 /**
  * Programmatically triggers / expands the ElevenLabs Conversational AI orb
@@ -47,11 +47,14 @@ export function SkillGridVoiceAgent({ agentId = ELEVENLABS_AGENT_ID }: { agentId
         document.body.appendChild(script);
       }
 
-      // 2. Ensure the custom element is in the DOM
-      if (!document.querySelector("elevenlabs-convai")) {
+      // 2. Ensure the custom element is in the DOM with the correct agent-id
+      const existingConvai = document.querySelector("elevenlabs-convai");
+      if (!existingConvai) {
         const convai = document.createElement("elevenlabs-convai");
         convai.setAttribute("agent-id", agentId);
         document.body.appendChild(convai);
+      } else if (existingConvai.getAttribute("agent-id") !== agentId) {
+        existingConvai.setAttribute("agent-id", agentId);
       }
     } catch (err) {
       console.warn("SkillGrid voice agent initialization warning:", err);
@@ -62,7 +65,7 @@ export function SkillGridVoiceAgent({ agentId = ELEVENLABS_AGENT_ID }: { agentId
 }
 
 /**
- * A luxury header action button to talk with the SkillGrid AI Assistant (Raqeeb)
+ * A luxury header action button to talk with the SkillGrid AI Assistant
  */
 export function SkillGridVoiceTrigger({ className }: { className?: string }) {
   return (
@@ -74,14 +77,14 @@ export function SkillGridVoiceTrigger({ className }: { className?: string }) {
       className={`group relative overflow-hidden border-cyan-500/30 bg-cyan-950/20 text-cyan-200 hover:bg-cyan-900/30 hover:text-white transition-all shadow-[0_0_15px_-3px_rgba(39,146,220,0.25)] hover:shadow-[0_0_20px_0px_rgba(39,146,220,0.4)] ${
         className || ""
       }`}
-      title="Talk with Raqeeb (SkillGrid Voice AI Assistant)"
+      title="Talk with SkillGrid Voice AI Assistant"
     >
       <span className="relative flex h-2 w-2 mr-2">
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
         <span className="relative inline-flex rounded-full h-2 w-2 bg-[#2792dc]" />
       </span>
       <Sparkles className="size-3.5 mr-1.5 text-cyan-400 transition-transform group-hover:rotate-12" />
-      <span className="hidden sm:inline font-medium">Ask Raqeeb</span>
+      <span className="hidden sm:inline font-medium">Ask Assistant</span>
       <Mic className="size-3.5 ml-1 text-cyan-300" />
     </Button>
   );
