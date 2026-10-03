@@ -31,6 +31,7 @@ import { ensureInstances, dayPct } from "@/lib/data";
 import { daysAgo, todayStr } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 import { Logo, UserAvatar } from "./primitives";
+import { SkillGridVoiceTrigger } from "@/components/SkillGridVoiceAgent";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -195,6 +196,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Link>
           <div className="hidden md:block" />
           <div className="flex items-center gap-2">
+            <SkillGridVoiceTrigger />
             <Link
               to="/friends"
               search={{ tab: "requests" }}

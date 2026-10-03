@@ -15,6 +15,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { themeInitScript } from "@/lib/theme";
 import { PostLoginTransition } from "@/components/ui/post-login-transition";
+import { SkillGridVoiceAgent } from "@/components/SkillGridVoiceAgent";
 import { motion } from "framer-motion";
 
 import appCss from "../styles.css?url";
@@ -104,6 +105,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap",
       },
     ],
+    scripts: [
+      {
+        src: "https://elevenlabs.io/convai-widget/index.js",
+        async: true,
+        type: "text/javascript",
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -190,6 +198,7 @@ function RootComponent() {
               }}
             />
           )}
+          <SkillGridVoiceAgent />
           <Toaster richColors position="top-center" />
         </TooltipProvider>
       </AuthProvider>

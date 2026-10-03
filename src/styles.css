@@ -161,3 +161,14 @@
     linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
   background-size: 32px 32px;
 }
+
+/* ElevenLabs Conversational Voice Assistant custom positioning & mobile clearance */
+elevenlabs-convai {
+  z-index: 99999 !important;
+}
+
+@media (max-width: 768px) {
+  elevenlabs-convai {
+    bottom: 4.75rem !important;
+  }
+}
